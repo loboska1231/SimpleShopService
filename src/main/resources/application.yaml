@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: OrderService
+  datasource:
+    url: jdbc:http://localhost:5432/orders
+    username: psql
+    password: psql
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/products
+      username: mongo
+      password: mongo

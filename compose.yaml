@@ -1,0 +1,20 @@
+services:
+  orders-service:
+    image: postgres:latest
+    container_name: orders-service
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: orders
+      POSTGRES_USER: psql
+      POSTGRES_PASSWORD: psql
+
+  products-service:
+    image: mongo:latest
+    container_name: products-service
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: products
