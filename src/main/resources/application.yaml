@@ -8,5 +8,17 @@ spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017/products
-      username: mongo
-      password: mongo
+  jpa:
+    hibernate:
+      ddl-auto: none
+#  liquibase:
+#    enabled: false
+
+#  mail:
+#    host:
+#    port:
+#    password:
+#    username:
+
+server:
+  port: 8080
