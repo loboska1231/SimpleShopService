@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.project.orderservice.dtos.onRequest.orders.CreateOrderDto;
 import org.project.orderservice.dtos.onRequest.orders.UpdateOrderDto;
 import org.project.orderservice.dtos.onResponse.OrderResponseDto;
+import org.project.orderservice.services.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,11 +28,11 @@ public class OrderController {
     }
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponseDto> getOrder(@PathVariable Integer id) {
-        return ResponseEntity.ok(orderService.findOrderById(id));
+        return ResponseEntity.ok(orderService.findOrderById(id).get());
     }
     @PatchMapping("/{id}")
     public ResponseEntity<OrderResponseDto> updateOrder(@PathVariable Integer id, @Valid @RequestBody UpdateOrderDto dto) {
-        return ResponseEntity.ok(orderService.updateOrder);
+        return ResponseEntity.ok(orderService.updateOrder(id,dto));
     }
     @DeleteMapping
     public ResponseEntity<OrderResponseDto> deleteOrder(@PathVariable Integer id) {

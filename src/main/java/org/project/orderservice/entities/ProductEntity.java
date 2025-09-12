@@ -2,7 +2,6 @@ package org.project.orderservice.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.project.orderservice.enums.Currency;
 
 import java.math.BigDecimal;
 
@@ -13,7 +12,6 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "products")
 public class ProductEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -21,11 +19,6 @@ public class ProductEntity {
     private String category;
 
     private BigDecimal price;
-
-    @Enumerated(EnumType.STRING)
-    private Currency currency;
-
-    private Integer total_amount;
 
     private String type;
 

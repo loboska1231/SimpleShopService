@@ -2,12 +2,9 @@ spring:
   application:
     name: OrderService
   datasource:
-    url: jdbc:http://localhost:5432/orders
+    url: jdbc:http://localhost:5432/shop_db
     username: psql
     password: psql
-  data:
-    mongodb:
-      uri: mongodb://localhost:27017/products
   jpa:
     hibernate:
       ddl-auto: none

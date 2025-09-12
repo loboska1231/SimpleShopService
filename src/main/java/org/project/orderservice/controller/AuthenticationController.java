@@ -6,6 +6,7 @@ import org.project.orderservice.dtos.onRequest.orders.CreateOrderDto;
 import org.project.orderservice.dtos.onRequest.users.UserAuthDto;
 import org.project.orderservice.dtos.onRequest.users.UserRegistrationDto;
 import org.project.orderservice.dtos.onResponse.TokensDto;
+import org.project.orderservice.services.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +25,6 @@ public class AuthenticationController {
     }
     @PostMapping("/refresh")
     public ResponseEntity<TokensDto> refreshToken(@Valid @RequestBody String refreshToken) {
-        return ResponseEntity.ok(userService.registrateUser(dto));
+        return ResponseEntity.ok(userService.refreshToken(refreshToken));
     }
 }
