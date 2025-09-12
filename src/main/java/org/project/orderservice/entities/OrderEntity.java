@@ -5,11 +5,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -33,15 +36,5 @@ public class OrderEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "order")
     private List<ProductEntity> products;
 
-    private BigDecimal getTotalPrice(){
-        if(!CollectionUtils.isEmpty(products)){
-            return products
-                    .stream()
-                    .map(ProductEntity::getTotal)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        } else {
-            return BigDecimal.ZERO;
-        }
-    };
 }

@@ -12,6 +12,7 @@ public record ProductResponseDto(
         BigDecimal price,
         Currency currency,
         String type,
-        String isAvailable
+        String isAvailable,
+        Integer amount
 ) {
 }

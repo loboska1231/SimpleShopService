@@ -25,7 +25,7 @@ public class ProductEntity {
     @Enumerated(EnumType.STRING)
     private Currency currency;
 
-    private Integer amount;
+    private Integer total_amount;
 
     private String type;
 
@@ -33,9 +33,5 @@ public class ProductEntity {
     @ManyToOne(cascade = {})
     @JoinColumn(name="order_id")
     private OrderEntity order;
-
-    public BigDecimal getTotal(){
-        return price.multiply(BigDecimal.valueOf(amount));
-    }
 
 }
