@@ -6,10 +6,9 @@ import java.math.BigDecimal;
 
 @Builder
 public record ProductResponseDto(
-        Integer id,
+        String id,
         String category,
         BigDecimal price,
-        String type,
-        Integer amount
+        String type
 ) {
 }

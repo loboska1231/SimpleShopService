@@ -5,13 +5,15 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.NonNull;
+import org.hibernate.validator.constraints.Length;
 
 
 import java.math.BigDecimal;
 
 @Builder
 public record UpdateProductDto(
-        @NonNull @NotBlank Integer id,
-        @Nullable @Min(value = 1) BigDecimal price
+        @Nullable @Min(value = 1) BigDecimal price,
+        @Nullable @Length(min=1) String category,
+        @Nullable @Length(min=1) String type
 ) {
 }

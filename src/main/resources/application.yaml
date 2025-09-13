@@ -2,12 +2,17 @@ spring:
   application:
     name: OrderService
   datasource:
-    url: jdbc:http://localhost:5432/shop_db
+    url: jdbc:postgresql://localhost:5432/orders_db
     username: psql
     password: psql
+
   jpa:
     hibernate:
       ddl-auto: none
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/products_db
+
 #  liquibase:
 #    enabled: false
 

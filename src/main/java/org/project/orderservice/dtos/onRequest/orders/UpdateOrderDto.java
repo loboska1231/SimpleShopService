@@ -8,6 +8,7 @@ import java.util.List;
 @Builder
 public record UpdateOrderDto(
         String address,
-        List<Integer> onDelete
+        List<String> onDelete,
+        List<UpdateOrderItemDto> updateItems
 ){
 }

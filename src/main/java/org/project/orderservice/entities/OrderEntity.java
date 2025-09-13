@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import org.project.orderservice.models.Product;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
@@ -21,7 +22,7 @@ import java.util.List;
 public class OrderEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     private String whose;
     private String email;
@@ -31,15 +32,15 @@ public class OrderEntity {
     private Instant date;
     private String status;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "order")
-    private List<ProductEntity> products;
+    private List<OrderItemEntity> items;
 
-    public BigDecimal getTotal(){
-        if(!CollectionUtils.isEmpty(products)){
-            return products
-                    .stream()
-                    .map(ProductEntity::getPrice)
-                    .reduce(BigDecimal.ZERO,BigDecimal::add);
-        } else return BigDecimal.ZERO;
-    }
+//    public BigDecimal getTotal(){
+//        if(!CollectionUtils.isEmpty(products)){
+//            return products
+//                    .stream()
+//                    .map(Product::getPrice)
+//                    .reduce(BigDecimal.ZERO,BigDecimal::add);
+//        } else return BigDecimal.ZERO;
+//    }
 
 }

@@ -1,0 +1,96 @@
+databaseChangeLog:
+  - changeSet:
+      id: "1.0.0"
+      author: "Borys"
+      changes:
+        - createSequence:
+            sequenceName: "orders_seq"
+        - createSequence:
+            sequenceName: "products_seq"
+        - createSequence:
+            sequenceName: "users_seq"
+        - createTable:
+            tableName: orders
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: orders_pk
+                  defaultValueSequenceNext: orders_seq
+              - column:
+                  name: status
+                  type: varchar(10)
+              - column:
+                  name: whose
+                  type: varchar(255)
+              - column:
+                  name: email
+                  type: varchar(255)
+              - column:
+                  name: address
+                  type: varchar(255)
+              - column:
+                  name: total_price
+                  type: numeric(38,2)
+              - column:
+                  name: date
+                  type: timestamptz
+
+        - createTable:
+            tableName: products
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: products_pk
+                  defaultValueSequenceNext: products_seq
+              - column:
+                  name: category
+                  type: varchar(255)
+              - column:
+                  name: price
+                  type: numeric(38,2)
+              - column:
+                  name: type
+                  type: varchar(255)
+
+  - changeSet:
+      id: "1.1.0"
+      author: "Borys"
+      changes:
+        - dropTable:
+            tableName: products
+        - dropSequence:
+            sequenceName: products_seq
+
+        - createSequence:
+            sequenceName: order_items_seq
+        - createTable:
+            tableName: order_items
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    primaryKeyName: order_items_pk
+                    primaryKey: true
+                  defaultValueSequenceNext: order_items_seq
+              - column:
+                  name: product_id
+                  type: varchar(255)
+              - column:
+                  name: amount
+                  type: bigint
+              - column:
+                  name: order_id
+                  type: bigint
+                  constraints:
+                    referencedTableName: orders
+                    referencedColumnNames: id
+                    foreignKeyName: order_id_fk
+
+

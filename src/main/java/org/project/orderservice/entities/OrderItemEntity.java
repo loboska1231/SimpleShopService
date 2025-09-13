@@ -10,21 +10,20 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "products")
-public class ProductEntity {
+@Table(name = "order_items")
+public class OrderItemEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue
+    private Long id;
 
-    private String category;
+    @Column(name = "product_id")
+    private String productId;
 
     private BigDecimal price;
 
-    private String type;
-
+    private Long amount;
     @ToString.Exclude
     @ManyToOne(cascade = {})
-    @JoinColumn(name="order_id")
+    @JoinColumn(name = "order_id")
     private OrderEntity order;
-
 }

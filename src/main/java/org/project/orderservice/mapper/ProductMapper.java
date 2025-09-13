@@ -6,17 +6,16 @@ import org.mapstruct.MappingTarget;
 import org.project.orderservice.dtos.onRequest.products.CreateProductDto;
 import org.project.orderservice.dtos.onRequest.products.UpdateProductDto;
 import org.project.orderservice.dtos.onResponse.ProductResponseDto;
-import org.project.orderservice.entities.ProductEntity;
-import org.project.orderservice.repository.ProductRepository;
+import org.project.orderservice.models.Product;
 
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 import static org.mapstruct.NullValuePropertyMappingStrategy.IGNORE;
 
 @Mapper(componentModel = SPRING)
 public interface ProductMapper {
-    ProductEntity toEntity(CreateProductDto dto);
-    ProductResponseDto toResponse(ProductEntity entity);
+    Product toEntity(CreateProductDto dto);
+    ProductResponseDto toResponse(Product model);
 
     @BeanMapping(nullValuePropertyMappingStrategy = IGNORE)
-    ProductEntity updateEntity(@MappingTarget ProductEntity entity, UpdateProductDto dto);
+    Product updateEntity(@MappingTarget Product entity, UpdateProductDto dto);
 }

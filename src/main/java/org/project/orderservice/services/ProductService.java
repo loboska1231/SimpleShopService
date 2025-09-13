@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.project.orderservice.dtos.onRequest.products.CreateProductDto;
 import org.project.orderservice.dtos.onRequest.products.UpdateProductDto;
 import org.project.orderservice.dtos.onResponse.ProductResponseDto;
-import org.project.orderservice.entities.ProductEntity;
+import org.project.orderservice.models.Product;
 import org.project.orderservice.mapper.ProductMapper;
 import org.project.orderservice.repository.ProductRepository;
 import org.springframework.stereotype.Service;
@@ -20,8 +20,8 @@ public class ProductService {
     private final ProductMapper productMapper;
 
     public ProductResponseDto createProduct(CreateProductDto dto){
-        ProductEntity product = productMapper.toEntity(dto);
-        ProductEntity save = productRepository.save(product);
+        Product product = productMapper.toEntity(dto);
+        Product save = productRepository.save(product);
         return productMapper.toResponse(save);
     }
 
@@ -29,18 +29,18 @@ public class ProductService {
         return productRepository.findAll().stream().map(productMapper::toResponse).toList();
     }
 
-    public Optional<ProductResponseDto> findOrderById(Integer id) {
+    public Optional<ProductResponseDto> findOrderById(String id) {
         return productRepository.findById(id).map(productMapper::toResponse);
     }
 
-    public Optional<ProductResponseDto> updateOrder(Integer id, UpdateProductDto dto) {
+    public Optional<ProductResponseDto> updateOrder(String id, UpdateProductDto dto) {
         return productRepository
                 .findById(id)
                 .map(product -> productMapper.updateEntity(product, dto))
                 .map(productMapper::toResponse);
     }
 
-    public void deleteProductById(Integer id) {
+    public void deleteProductById(String id) {
         productRepository.deleteById(id);
 
     }
