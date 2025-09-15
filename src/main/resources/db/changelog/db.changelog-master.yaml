@@ -93,4 +93,20 @@ databaseChangeLog:
                     referencedColumnNames: id
                     foreignKeyName: order_id_fk
 
+  - changeSet:
+      id: "1.1.a"
+      author: "Borys"
+      changes:
+        - addColumn:
+            tableName: order_items
+            columns:
+              - column:
+                  name: price
+                  type: numeric(38,2)
+  - changeSet:
+      id: "1.2.0"
+      author: "Borys"
+      changes:
+        - dropSequence:
+            sequenceName: "users_seq"
 

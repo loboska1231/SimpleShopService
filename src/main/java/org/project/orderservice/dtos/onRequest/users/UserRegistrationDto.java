@@ -11,6 +11,6 @@ public record UserRegistrationDto(
         @NonNull @NotBlank @Email(regexp = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$") String email,
         @NonNull @NotBlank @Length(min = 4) String password,
         @NonNull @NotBlank @Length(min = 2, max = 40) String firstName,
-        @NonNull @NotBlank @Length(min = 2, max = 40) String secondName
+        @NonNull @NotBlank @Length(min = 2, max = 40) String lastName
 ) {
 }

@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @Builder
 public record CreateProductDto(
         @NonNull @NotBlank @Length(min = 1, max = 30) String category,
-        @NonNull @NotBlank @Min(value = 1) BigDecimal price,
+        @NonNull @Min(value = 1) BigDecimal price,
         @NonNull @NotBlank @Length(min = 1, max = 30) String type
 ) {
 }

@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @Table(name = "order_items")
 public class OrderItemEntity {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "product_id")
@@ -26,4 +26,8 @@ public class OrderItemEntity {
     @ManyToOne(cascade = {})
     @JoinColumn(name = "order_id")
     private OrderEntity order;
+
+    public BigDecimal getTotalPrice() {
+        return price.multiply(new BigDecimal(amount));
+    }
 }

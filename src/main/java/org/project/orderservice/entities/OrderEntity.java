@@ -34,13 +34,18 @@ public class OrderEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "order")
     private List<OrderItemEntity> items;
 
-//    public BigDecimal getTotal(){
-//        if(!CollectionUtils.isEmpty(products)){
-//            return products
-//                    .stream()
-//                    .map(Product::getPrice)
-//                    .reduce(BigDecimal.ZERO,BigDecimal::add);
-//        } else return BigDecimal.ZERO;
-//    }
+    public void setTotal(){
+        if(!CollectionUtils.isEmpty(items)){
+            totalPrice = items
+                    .stream()
+                    .map(OrderItemEntity::getTotalPrice)
+                    .reduce(BigDecimal.ZERO,BigDecimal::add);
+        } else totalPrice = BigDecimal.ZERO;
+    }
+    public void assignOrder(){
+        if(!CollectionUtils.isEmpty(items)){
+            items.forEach(item -> item.setOrder(this));
+        }
+    }
 
 }

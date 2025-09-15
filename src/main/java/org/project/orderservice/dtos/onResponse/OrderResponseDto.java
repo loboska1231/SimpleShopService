@@ -13,6 +13,6 @@ public record OrderResponseDto (
         BigDecimal total_price,
         Instant date,
         String status,
-        List<OrderItemResponseDto> products
+        List<OrderItemResponseDto> items
 ){
 }
