@@ -5,7 +5,6 @@ spring:
     url: jdbc:postgresql://localhost:5432/orders_db
     username: psql
     password: psql
-
   jpa:
     hibernate:
       ddl-auto: none
@@ -21,6 +20,11 @@ spring:
 #    port:
 #    password:
 #    username:
-
+jwt:
+  secret: super-puper-mega-very-expensive-golf-club-trump-swamp-1941
+  access-token:
+    ttl-millis: 300000
+  refresh-token:
+    ttl-millis: 900000
 server:
   port: 8080
