@@ -21,9 +21,9 @@ spring:
 #    password:
 #    username:
 jwt:
-  secret: super-puper-mega-very-expensive-golf-club-trump-swamp-1941
+  secret: "b04db7ba74ae89ce6ae5f0ecb29eaa391b8b1c16cd95882df331e56f92c6887f"
   access-token:
-    ttl-millis: 300000
+    ttl-millis: 60000
   refresh-token:
     ttl-millis: 900000
 server:
