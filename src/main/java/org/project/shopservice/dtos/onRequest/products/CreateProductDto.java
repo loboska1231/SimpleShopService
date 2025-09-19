@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.NonNull;
 import org.hibernate.validator.constraints.Length;
 
-
 import java.math.BigDecimal;
 
 @Builder

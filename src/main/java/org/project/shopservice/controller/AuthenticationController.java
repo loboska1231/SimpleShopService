@@ -2,12 +2,16 @@ package org.project.shopservice.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.project.shopservice.dtos.onRequest.users.RefreshToken;
 import org.project.shopservice.dtos.onRequest.users.UserAuthDto;
 import org.project.shopservice.dtos.onRequest.users.UserRegistrationDto;
 import org.project.shopservice.dtos.onResponse.TokensDto;
 import org.project.shopservice.services.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,7 +27,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(userService.registrateUser(dto));
     }
     @PostMapping("/refresh")
-    public ResponseEntity<TokensDto> refreshToken(@Valid @RequestBody String refreshToken) {
-        return ResponseEntity.ok(userService.refreshToken(refreshToken));
+    public ResponseEntity<TokensDto> refreshToken(@Valid @RequestBody RefreshToken refreshToken) {
+        return ResponseEntity.ok(userService.refreshToken(refreshToken.refreshToken())); // =D
     }
 }

@@ -21,7 +21,7 @@ spring:
 #    password:
 #    username:
 jwt:
-  secret: "b04db7ba74ae89ce6ae5f0ecb29eaa391b8b1c16cd95882df331e56f92c6887f"
+  secret-key: "a1a4942fc86f78620bc6f9a0fd7de653e0c08efa430f2c7ae7567c089a0087905bcfad2794cc3f6f"
   access-token:
     ttl-millis: 60000
   refresh-token:

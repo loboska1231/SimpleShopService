@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.project.shopservice.dtos.onRequest.products.CreateProductDto;
 import org.project.shopservice.dtos.onRequest.products.UpdateProductDto;
 import org.project.shopservice.dtos.onResponse.ProductResponseDto;
-import org.project.shopservice.models.Product;
 import org.project.shopservice.mapper.ProductMapper;
+import org.project.shopservice.models.Product;
 import org.project.shopservice.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 

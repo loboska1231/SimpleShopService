@@ -7,55 +7,59 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.project.shopservice.security.utils.JwtUtil;
 import org.springframework.http.HttpHeaders;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authorization.AuthorizationDeniedException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
-
 @RequiredArgsConstructor
+@Slf4j
 public class JwtFilter extends OncePerRequestFilter {
 
 	private final JwtUtil jwtUtil;
 	private final UserDetailsService userDetailsService;
 	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException { // ### 2 ###
+	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,@NonNull FilterChain filterChain) throws ServletException, IOException { // ### 2 ###
 		String authHeaderValue = request.getHeader(HttpHeaders.AUTHORIZATION); // ### 4 ###
-
-		if(StringUtils.isBlank(authHeaderValue) ){
+		if(StringUtils.isBlank(authHeaderValue) ||  !authHeaderValue.startsWith("Bearer ")){
 			filterChain.doFilter(request, response);
 			return;
 		}
 		String token = authHeaderValue.substring(7);
+		String username = jwtUtil.extractUsername(token);
 		try{
-			if (!jwtUtil.isExpired(token)) {
-				filterChain.doFilter(request, response);
-				return;
+			if(StringUtils.isNotBlank(username) && SecurityContextHolder.getContext().getAuthentication() == null){
+				UserDetails user = userDetailsService.loadUserByUsername(username);
+				if (jwtUtil.isTokenValid(token, user)) {
+					SecurityContext context = SecurityContextHolder.createEmptyContext();
+					log.info(user.toString());
+					UsernamePasswordAuthenticationToken authentication =
+							new UsernamePasswordAuthenticationToken(
+									user,
+									null,
+									user.getAuthorities()
+							);
+					authentication.setDetails(
+							new WebAuthenticationDetailsSource()
+									.buildDetails(request)
+					);
+					context.setAuthentication(authentication);
+					SecurityContextHolder.setContext(context);
+				}
 			}
-
-			String username = jwtUtil.extractUsername(token);
-			UserDetails user = userDetailsService.loadUserByUsername(username);
-			List<GrantedAuthority> authorities = jwtUtil.extractFromToken(token, claims -> claims.get("roles",List.class))
-					.stream()
-					.map(role-> new SimpleGrantedAuthority("ROLE_%s".formatted(role.toString())))
-					.toList();
-			Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-			SecurityContextHolder.getContext().setAuthentication(authentication);
-
 		} catch (Exception e){
-			throw new AuthorizationDeniedException("denied");
+			throw new AuthorizationDeniedException(e.getMessage());
 		} finally {
 			filterChain.doFilter(request, response);
-
 		}
 	}
 }

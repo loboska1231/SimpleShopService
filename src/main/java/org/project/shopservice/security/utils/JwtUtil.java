@@ -4,8 +4,11 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
+import org.project.shopservice.models.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,29 +16,34 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 @Component
+@Slf4j
 public class JwtUtil { //### 5 ###
 
-	@Value("${jwt.secret}")
-	private String secret;
+	@Value("${jwt.secret-key}")
+	private  String secret;
 	@Value("${jwt.access-token.ttl-millis}")
 	private long accessTokenTtlMillis;
 	@Value("${jwt.refresh-token.ttl-millis}")
 	private long refreshTokenTtlMillis;
-	private Key key;
 
+	private Key key;
 	private JwtParser jwtParser;
 
 	@PostConstruct
-	public void setKey(){
+	public void setUpKey() {
 		key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
 		jwtParser = Jwts.parserBuilder().setSigningKey(key).build();
 	}
 
 	private String generateToken(String username, long ttlMillis, Map<String, Object> claims) {
+		log.info("KEY :: {}", key);
 		return Jwts.builder()
 				.setSubject(username)
 				.setClaims(claims)
@@ -45,30 +53,31 @@ public class JwtUtil { //### 5 ###
 				.compact();
 	}
 
-	public String generateAccessToken(UserDetails userDetails){
-		List<String> roles = userDetails
-				.getAuthorities()
-				.stream()
-				.map(GrantedAuthority::getAuthority)
-				.toList();
-		return generateToken(userDetails.getUsername(),accessTokenTtlMillis, Map.of("roles", roles));
+	public String generateAccessToken(User user){
+		return generateToken(user.getUsername(),accessTokenTtlMillis, user.toMap());
 	}
 
-	public String generateRefreshToken(UserDetails userDetails){
-		return generateToken(userDetails.getUsername(),refreshTokenTtlMillis, Collections.emptyMap());
+	public String generateRefreshToken(User user){
+		return generateToken(user.getUsername(),refreshTokenTtlMillis, Map.of("roles",user.getAuthorities()));
 	}
 
-	public boolean isExpired(String token){
+	private boolean isExpired(String token){
 		Date expireAt = extractFromToken(token, Claims::getExpiration);
 		return expireAt.before(new Date());
 	}
-
-	public <T> T extractFromToken(String token, Function<Claims, T> extractor){
-		Claims claims = jwtParser.parseClaimsJwt(token).getBody();
+	private <T> T extractFromToken(String token, Function<Claims, T> extractor){
+		Claims claims = extractAllClaims(token);
 		return extractor.apply(claims);
 	}
-
+	private Claims extractAllClaims(String token){
+		return jwtParser.parseClaimsJws(token).getBody();
+	}
 	public String extractUsername(String token){
+
 		return extractFromToken(token, Claims::getSubject);
+	}
+	public boolean isTokenValid(String token, UserDetails userDetails){
+		String s = extractUsername(token);
+		return s.equals(userDetails.getUsername()) && !isExpired(s);
 	}
 }

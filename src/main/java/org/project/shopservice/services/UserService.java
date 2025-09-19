@@ -1,13 +1,12 @@
 package org.project.shopservice.services;
 
+import io.jsonwebtoken.JwtException;
 import io.micrometer.common.util.StringUtils;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.project.shopservice.dtos.onRequest.users.UserAuthDto;
 import org.project.shopservice.dtos.onRequest.users.UserRegistrationDto;
 import org.project.shopservice.dtos.onResponse.TokensDto;
-import org.project.shopservice.mapper.UserMapper;
 import org.project.shopservice.models.User;
 import org.project.shopservice.repository.UserRepository;
 import org.project.shopservice.security.utils.JwtUtil;
@@ -22,14 +21,11 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
     public TokensDto authenticateUser( UserAuthDto dto) {
         User user = userRepository.findByUsername(dto.username()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        log.info("dto.password {}",passwordEncoder.encode(dto.password()));
-        log.info("user.password {}",user.getPassword());
         if(passwordEncoder.matches(dto.password(), user.getPassword())){
             return generator(user);
         }
@@ -50,12 +46,15 @@ public class UserService implements UserDetailsService {
 
     public TokensDto refreshToken(String refreshToken) {
         if(StringUtils.isNotBlank(refreshToken)){
+            log.info("RefreshToken :: {}", refreshToken);
             String username = jwtUtil.extractUsername(refreshToken);
+            log.info("username :: {}", username);
             User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-            return generator(user);
+            log.info("user :: {}", user);
+            if(user.getRefreshToken().equals(refreshToken)) return generator(user);
+            else throw new JwtException("fok yu");
         }
         return null;
-
     }
 
     @Override

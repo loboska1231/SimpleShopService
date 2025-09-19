@@ -1,6 +1,5 @@
 package org.project.shopservice.repository;
 
-import jakarta.validation.Valid;
 import org.project.shopservice.models.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;

@@ -1,19 +1,15 @@
 package org.project.shopservice.models;
 
 import io.micrometer.common.util.StringUtils;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
+import java.lang.reflect.Field;
+import java.util.*;
 
 @Data
 @AllArgsConstructor
@@ -34,5 +30,20 @@ public class User implements UserDetails {
 		if(StringUtils.isNotBlank(role)){
 			return Set.of(new SimpleGrantedAuthority(role));
 		} else return Collections.emptySet();
+	}
+	@SneakyThrows
+	public Map<String, Object> toMap(){
+		Map<String, Object> map = new HashMap<>();
+		Class<?> obj =  this.getClass();
+		for(Field f: obj.getDeclaredFields()){
+			f.setAccessible(true);
+			if(!f.getName().equals("password") && !f.getName().equals("refreshToken")) {
+				map.put(f.getName(), f.get(this));
+			}
+			if(f.getName().equals("role")){
+				map.put(f.getName(), this.getAuthorities());
+			}
+		}
+		return map;
 	}
 }
