@@ -27,13 +27,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class OrderService {
+    private final UserService userService;
 
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
 
     private final ProductMapper productMapper;
     private final OrderMapper orderMapper;
-
 
     public List<OrderResponseDto> findOrders() {
         return orderRepository.findAll().stream().map(orderMapper::toDto).toList();
@@ -44,6 +44,7 @@ public class OrderService {
         loadOrderItemsInfo(order);
         order.setTotal();
         order.assignOrder();
+        userService.fillFieldsUsernameAndWhose(order);
         OrderEntity save = orderRepository.save(order);
 
         return orderMapper.toDto(save);
@@ -59,8 +60,7 @@ public class OrderService {
 
 
     public OrderResponseDto updateOrder(Integer order_id, UpdateOrderDto dto) {
-        OrderEntity order = orderRepository.findById(order_id).get();
-
+        OrderEntity order = orderRepository.findById(order_id).orElseThrow();   // NoSuchElementException
         deleteItems(order, dto);
         orderMapper.updateOrderItems(order, dto);
         loadOrderItemsInfo(order);
@@ -71,7 +71,7 @@ public class OrderService {
         return orderMapper.toDto(save);
     }
 
-    public OrderEntity deleteItems(OrderEntity order, UpdateOrderDto dto){
+    private OrderEntity deleteItems(OrderEntity order, UpdateOrderDto dto){
         List<String> idsToDelete = dto.onDelete();
         log.info("ids to delete: {}", idsToDelete);
         List<String> idsToUpdate = dto.updateItems().stream().map(UpdateOrderItemDto::productId).toList();
@@ -93,7 +93,7 @@ public class OrderService {
         return order;
     }
 
-    public OrderEntity loadOrderItemsInfo(OrderEntity order) {
+    private OrderEntity loadOrderItemsInfo(OrderEntity order) {
         List<OrderItemEntity> items = order.getItems();
         if(!CollectionUtils.isEmpty(items)) {
             List<String> ids = items.stream().map(OrderItemEntity::getProductId).toList();

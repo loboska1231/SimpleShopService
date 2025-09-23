@@ -23,7 +23,7 @@ public class OrderEntity {
     private Long id;
 
     private String whose;
-    private String email;
+    private String username;
     private String address;
     @Column(name="total_price")
     private BigDecimal totalPrice;

@@ -8,7 +8,7 @@ import java.util.List;
 @Builder
 public record OrderResponseDto (
         String whose,
-        String email,
+        String username,
         String address,
         BigDecimal total_price,
         Instant date,

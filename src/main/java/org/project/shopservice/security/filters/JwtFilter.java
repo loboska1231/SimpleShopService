@@ -68,11 +68,11 @@ public class JwtFilter extends OncePerRequestFilter {
 //		} finally {
 //			filterChain.doFilter(request, response);
 //		}
+		if(StringUtils.isBlank(token) ){
+			filterChain.doFilter(request, response);
+			return;
+		}
 		try{
-			if(StringUtils.isBlank(token) ){
-				filterChain.doFilter(request, response);
-				return;
-			}
 			String username = jwtUtil.extractUsername(token);
 			UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 			if(!jwtUtil.isTokenValid(token, userDetails)){

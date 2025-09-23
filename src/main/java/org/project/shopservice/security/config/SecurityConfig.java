@@ -3,7 +3,7 @@ package org.project.shopservice.security.config;
 import lombok.RequiredArgsConstructor;
 import org.project.shopservice.security.filters.JwtFilter;
 import org.project.shopservice.security.utils.JwtUtil;
-import org.project.shopservice.services.UserService;
+import org.project.shopservice.services.AuthService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -26,7 +26,7 @@ import org.springframework.security.web.access.intercept.AuthorizationFilter;
 @EnableMethodSecurity
 public class SecurityConfig {
 	private final JwtUtil jwtUtil;
-	private final UserService userService;
+	private final AuthService authService;
 	private final PasswordEncoder passwordEncoder;
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{ // ### 1 ###
@@ -46,11 +46,11 @@ public class SecurityConfig {
 
 	@Bean
 	public JwtFilter jwtFilter(){ // ### 3 ###
-		return new JwtFilter(jwtUtil,userService);
+		return new JwtFilter(jwtUtil, authService);
 	}
 	@Bean
 	public AuthenticationProvider authenticationProvider(){
-		DaoAuthenticationProvider dao = new DaoAuthenticationProvider(userService);
+		DaoAuthenticationProvider dao = new DaoAuthenticationProvider(authService);
 		dao.setPasswordEncoder(passwordEncoder);
 		return dao;
 	}

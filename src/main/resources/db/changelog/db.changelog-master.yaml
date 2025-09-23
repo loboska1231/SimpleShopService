@@ -110,3 +110,12 @@ databaseChangeLog:
         - dropSequence:
             sequenceName: "users_seq"
 
+  - changeSet:
+      id: "1.3.0"
+      author: "Borys"
+      changes:
+        - renameColumn:
+            tableName: orders
+            oldColumnName: email
+            newColumnName: username
+
