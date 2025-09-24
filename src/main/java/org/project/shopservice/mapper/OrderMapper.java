@@ -27,18 +27,14 @@ public interface OrderMapper {
     @Mapping(target = "total_price", source = "totalPrice")
     OrderResponseDto toDto(OrderEntity order);
 
-    @Mapping(target ="items", source = "updateItems")
-    @Mapping(target = "status", constant = "UPDATED")
-    OrderEntity updateOrder(@MappingTarget OrderEntity order,UpdateOrderDto dto);
-
     OrderItemEntity toItemEntity(CreateOrderItemDto dto);
     OrderItemEntity toItemEntity(UpdateOrderItemDto dto);
 
     OrderItemResponseDto toItemDto(OrderItemEntity orderItem);
 
-
-    default OrderEntity updateOrderItems(@MappingTarget OrderEntity order ,UpdateOrderDto dto){
+    default OrderEntity updateOrder(@MappingTarget OrderEntity order , UpdateOrderDto dto){
         order.setStatus("UPDATED");
+        order.setAddress(dto.address());
         List<OrderItemEntity> items = order.getItems();
         List<UpdateOrderItemDto> dtoItems = dto.updateItems();
         items.forEach(item->{

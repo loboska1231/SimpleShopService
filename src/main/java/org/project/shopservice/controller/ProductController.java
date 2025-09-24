@@ -27,13 +27,13 @@ public class ProductController {
     }
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponseDto> getProduct(@PathVariable String id) { // permit all
-        return ResponseEntity.ok(productService.findOrderById(id).get());
+        return ResponseEntity.ok(productService.findProductById(id).orElseThrow());
     }
     @PatchMapping("/{id}")
     public ResponseEntity<ProductResponseDto> updateProduct(@PathVariable String id, @Valid @RequestBody UpdateProductDto dto) {
-        return ResponseEntity.ok(productService.updateOrder(id, dto).get());
+        return ResponseEntity.ok(productService.updateProduct(id, dto).orElseThrow());
     }
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     public ResponseEntity<ProductResponseDto> deleteProduct(@PathVariable String id) {
         productService.deleteProductById(id);
         return ResponseEntity.noContent().build();

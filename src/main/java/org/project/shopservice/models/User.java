@@ -37,7 +37,7 @@ public class User implements UserDetails {
 		Class<?> obj =  this.getClass();
 		for(Field f: obj.getDeclaredFields()){
 			f.setAccessible(true);
-			if(!f.getName().equals("password") && !f.getName().equals("refreshToken")) {
+			if(!f.getName().equals("password")) {
 				map.put(f.getName(), f.get(this));
 			}
 			if(f.getName().equals("role")){

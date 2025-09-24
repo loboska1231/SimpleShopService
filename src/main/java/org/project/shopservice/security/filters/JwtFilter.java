@@ -41,33 +41,6 @@ public class JwtFilter extends OncePerRequestFilter {
 			return;
 		}
 		String token = authHeaderValue.substring(7);
-		log.info("token :: {}", token);
-//		String username = jwtUtil.extractUsername(token);
-//		try{
-//			if(StringUtils.isNotBlank(username) && SecurityContextHolder.getContext().getAuthentication() == null){
-//				UserDetails user = userDetailsService.loadUserByUsername(username);
-//				if (jwtUtil.isTokenValid(token, user)) {
-//					SecurityContext context = SecurityContextHolder.createEmptyContext();
-//					log.info(user.toString());
-//					UsernamePasswordAuthenticationToken authentication =
-//							new UsernamePasswordAuthenticationToken(
-//									user,
-//									null,
-//									user.getAuthorities()
-//							);
-//					authentication.setDetails(
-//							new WebAuthenticationDetailsSource()
-//									.buildDetails(request)
-//					);
-//					context.setAuthentication(authentication);
-//					SecurityContextHolder.setContext(context);
-//				}
-//			}
-//		} catch (Exception e){
-//			throw new AuthorizationDeniedException(e.getMessage());
-//		} finally {
-//			filterChain.doFilter(request, response);
-//		}
 		if(StringUtils.isBlank(token) ){
 			filterChain.doFilter(request, response);
 			return;
@@ -82,7 +55,7 @@ public class JwtFilter extends OncePerRequestFilter {
 			Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 		} catch (Exception e){
-			throw new AuthenticationException(e.getMessage());
+			throw new AuthenticationException("Failed to authenticate user", e);
 		} finally {
 			filterChain.doFilter(request, response);
 		}

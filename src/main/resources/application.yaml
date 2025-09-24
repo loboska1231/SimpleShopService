@@ -15,11 +15,17 @@ spring:
 #  liquibase:
 #    enabled: false
 
-#  mail:
-#    host:
-#    port:
-#    password:
-#    username:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    password: suskovboris@gmail.com
+    username: ${mail-password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 jwt:
   secret-key: "a1a4942fc86f78620bc6f9a0fd7de653e0c08efa430f2c7ae7567c089a0087905bcfad2794cc3f6f"
   access-token:

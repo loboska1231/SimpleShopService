@@ -29,11 +29,11 @@ public class ProductService {
         return productRepository.findAll().stream().map(productMapper::toResponse).toList();
     }
 
-    public Optional<ProductResponseDto> findOrderById(String id) {
+    public Optional<ProductResponseDto> findProductById(String id) {
         return productRepository.findById(id).map(productMapper::toResponse);
     }
 
-    public Optional<ProductResponseDto> updateOrder(String id, UpdateProductDto dto) {
+    public Optional<ProductResponseDto> updateProduct(String id, UpdateProductDto dto) {
         return productRepository
                 .findById(id)
                 .map(product -> productMapper.updateEntity(product, dto))

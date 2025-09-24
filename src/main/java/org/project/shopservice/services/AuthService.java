@@ -46,13 +46,10 @@ public class AuthService implements UserDetailsService {
 
     public TokensDto refreshToken(String refreshToken) {
         if(StringUtils.isNotBlank(refreshToken)){
-            log.info("RefreshToken :: {}", refreshToken);
             String username = jwtUtil.extractUsername(refreshToken);
-            log.info("username :: {}", username);
             User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-            log.info("user :: {}", user);
             if(user.getRefreshToken().equals(refreshToken)) return generator(user);
-            else throw new JwtException("fok yu");
+            else throw new JwtException("Wrong token");
         }
         return null;
     }

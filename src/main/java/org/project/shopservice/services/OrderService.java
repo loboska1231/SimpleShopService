@@ -7,6 +7,7 @@ import org.project.shopservice.dtos.onRequest.orders.UpdateOrderDto;
 import org.project.shopservice.dtos.onRequest.orders.UpdateOrderItemDto;
 import org.project.shopservice.dtos.onResponse.OrderResponseDto;
 import org.project.shopservice.dtos.onResponse.ProductResponseDto;
+import org.project.shopservice.dtos.onResponse.SendEmailDto;
 import org.project.shopservice.entities.OrderEntity;
 import org.project.shopservice.entities.OrderItemEntity;
 import org.project.shopservice.mapper.OrderMapper;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class OrderService {
     private final UserService userService;
+    private final EmailService emailService;
 
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
@@ -47,6 +49,12 @@ public class OrderService {
         userService.fillFieldsUsernameAndWhose(order);
         OrderEntity save = orderRepository.save(order);
 
+//        emailService.sendEmail(SendEmailDto.builder()
+//                        .to(order.getEmail())
+//                        .subject("Order created!")
+//                        .body(order.toString())
+//                .build());
+
         return orderMapper.toDto(save);
     }
 
@@ -62,7 +70,7 @@ public class OrderService {
     public OrderResponseDto updateOrder(Integer order_id, UpdateOrderDto dto) {
         OrderEntity order = orderRepository.findById(order_id).orElseThrow();   // NoSuchElementException
         deleteItems(order, dto);
-        orderMapper.updateOrderItems(order, dto);
+        orderMapper.updateOrder(order, dto);
         loadOrderItemsInfo(order);
         order.setTotal();
         order.assignOrder();
@@ -73,20 +81,16 @@ public class OrderService {
 
     private OrderEntity deleteItems(OrderEntity order, UpdateOrderDto dto){
         List<String> idsToDelete = dto.onDelete();
-        log.info("ids to delete: {}", idsToDelete);
         List<String> idsToUpdate = dto.updateItems().stream().map(UpdateOrderItemDto::productId).toList();
         boolean contains =  false;
         if(!idsToUpdate.isEmpty()){
             contains = idsToDelete.stream().anyMatch(idsToUpdate::contains);
         }
-        log.info("contains: {}", contains);
         if(!CollectionUtils.isEmpty(idsToDelete) && !contains) {
             List<OrderItemEntity> items = order.getItems();
             idsToDelete.forEach(id -> {
                 items.removeIf(item -> item.getProductId().equals(id));
-                log.info("id to delete: {}", id);
             });
-            log.info("items: {}", items);
             order.setItems(items);
         }
 

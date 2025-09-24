@@ -24,7 +24,7 @@ import java.util.function.Function;
 
 @Component
 @Slf4j
-public class JwtUtil { //### 5 ###
+public class JwtUtil {
 
 	@Value("${jwt.secret-key}")
 	private  String secret;
@@ -32,19 +32,16 @@ public class JwtUtil { //### 5 ###
 	private long accessTokenTtlMillis;
 	@Value("${jwt.refresh-token.ttl-millis}")
 	private long refreshTokenTtlMillis;
-
 	private Key key;
 	private JwtParser jwtParser;
 
 	@PostConstruct
 	public void setUpKey() {
 		key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-		log.info("Key set up :: {}", key);
 		jwtParser = Jwts.parserBuilder().setSigningKey(key).build();
 	}
 
 	private String generateToken(String username, long ttlMillis, Map<String, Object> claims) {
-		log.info("KEY :: {}", key);
 		return Jwts.builder()
 				.setClaims(claims)
 				.setSubject(username)
@@ -67,7 +64,6 @@ public class JwtUtil { //### 5 ###
 	}
 	private <T> T extractFromToken(String token, Function<Claims, T> extractor){
 		Claims claims = jwtParser.parseClaimsJws(token).getBody();
-		log.info("subject :: {}", claims.getSubject());
 		return extractor.apply(claims);
 	}
 	public String extractUsername(String token){
