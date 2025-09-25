@@ -7,7 +7,7 @@ import org.hibernate.validator.constraints.Length;
 
 @Builder
 public record UserAuthDto(
-        @NonNull @NotBlank String username,
+        @NonNull @NotBlank String email,
         @NonNull @NotBlank @Length(min = 4) String password
 ){
 }

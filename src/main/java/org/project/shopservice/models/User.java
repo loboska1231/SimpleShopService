@@ -19,7 +19,7 @@ import java.util.*;
 public class User implements UserDetails {
 	@MongoId
 	private String id;
-	private String username;
+	private String email;
 	private String password;
 	private String firstName;
 	private String lastName;
@@ -31,17 +31,35 @@ public class User implements UserDetails {
 			return Set.of(new SimpleGrantedAuthority(role));
 		} else return Collections.emptySet();
 	}
+
+	public Map<String, Object> getRoles(){
+		List<String> roles = this.getAuthorities()
+				.stream()
+				.map(GrantedAuthority::getAuthority)
+				.toList();
+		return Map.of("roles",roles);
+	}
+
+	@Override
+	public String getUsername() {
+		return email;
+	}
+
 	@SneakyThrows
 	public Map<String, Object> toMap(){
 		Map<String, Object> map = new HashMap<>();
 		Class<?> obj =  this.getClass();
 		for(Field f: obj.getDeclaredFields()){
 			f.setAccessible(true);
-			if(!f.getName().equals("password")) {
-				map.put(f.getName(), f.get(this));
+			String field = f.getName();
+			if(field.equals("refreshToken")){
+				continue;
 			}
-			if(f.getName().equals("role")){
-				map.put(f.getName(), this.getAuthorities());
+			if(!field.equals("password")) {
+				map.put(field, f.get(this));
+			}
+			if(field.equals("role")){
+				map.put(field, this.getRoles());
 			}
 		}
 		return map;

@@ -17,9 +17,7 @@ import org.project.shopservice.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -46,14 +44,10 @@ public class OrderService {
         loadOrderItemsInfo(order);
         order.setTotal();
         order.assignOrder();
-        userService.fillFieldsUsernameAndWhose(order);
+        userService.fillFieldsEmailAndWhose(order);
         OrderEntity save = orderRepository.save(order);
 
-//        emailService.sendEmail(SendEmailDto.builder()
-//                        .to(order.getEmail())
-//                        .subject("Order created!")
-//                        .body(order.toString())
-//                .build());
+        sendTemplate(order,"Order Created!", "order-created");
 
         return orderMapper.toDto(save);
     }
@@ -63,7 +57,10 @@ public class OrderService {
     }
 
     public void deleteOrderById(Integer id) {
-        orderRepository.deleteById(id);
+        OrderEntity order = orderRepository.findById(id).get();
+        order.setStatus("DELETED");
+        sendTemplate(order,"Order Deleted!", "order-deleted");
+        orderRepository.delete(order);
     }
 
 
@@ -76,40 +73,48 @@ public class OrderService {
         order.assignOrder();
         OrderEntity save = orderRepository.save(order);
 
+        sendTemplate(save,"Order updated!", "order-updated");
         return orderMapper.toDto(save);
     }
-
-    private OrderEntity deleteItems(OrderEntity order, UpdateOrderDto dto){
-        List<String> idsToDelete = dto.onDelete();
-        List<String> idsToUpdate = dto.updateItems().stream().map(UpdateOrderItemDto::productId).toList();
-        boolean contains =  false;
-        if(!idsToUpdate.isEmpty()){
-            contains = idsToDelete.stream().anyMatch(idsToUpdate::contains);
+        private OrderEntity deleteItems(OrderEntity order, UpdateOrderDto dto){
+            Set<String> idsToDelete = new HashSet<>(dto.onDelete());
+            Set<String> idsToUpdate = dto.updateItems().stream().map(UpdateOrderItemDto::productId).collect(Collectors.toSet());
+            boolean contains = !Collections.disjoint(idsToDelete, idsToUpdate);
+            if(!contains) {
+                List<OrderItemEntity> items = order.getItems();
+                idsToDelete.forEach(id -> items.removeIf(item -> item.getProductId().equals(id)));
+                order.setItems(items);
+            }
+            return order;
         }
-        if(!CollectionUtils.isEmpty(idsToDelete) && !contains) {
-            List<OrderItemEntity> items = order.getItems();
-            idsToDelete.forEach(id -> {
-                items.removeIf(item -> item.getProductId().equals(id));
-            });
-            order.setItems(items);
-        }
-
-        return order;
-    }
 
     private OrderEntity loadOrderItemsInfo(OrderEntity order) {
         List<OrderItemEntity> items = order.getItems();
         if(!CollectionUtils.isEmpty(items)) {
-            List<String> ids = items.stream().map(OrderItemEntity::getProductId).toList();
+            Set<String> ids = items.stream().map(OrderItemEntity::getProductId).collect(Collectors.toSet());
             Map<String, ProductResponseDto> products = productRepository.findAllByIdIn(ids)
                     .stream()
                     .map(productMapper::toResponse)
                     .collect(Collectors.toMap(ProductResponseDto::id, Function.identity()));
-            // in the future, I am going to add exception handler on exc(NotFound)
-
             items.forEach(item -> item.setPrice(products.get(item.getProductId()).price()));
             order.setItems(items);
         }
         return order;
+    }
+    private void sendTemplate(OrderEntity order, String subject, String templateName) {
+        emailService.sendEmail(SendEmailDto.builder()
+                .to(order.getEmail())
+                .subject(subject)
+                .templateName(templateName)
+                .contextData(Map.of(
+                        "whose", order.getWhose(),
+                        "email", order.getEmail(),
+                        "address", order.getAddress(),
+                        "totalPrice", order.getTotalPrice(),
+                        "date", order.getDate(),
+                        "status", order.getStatus(),
+                        "items", order.getItems()
+                ))
+                .build());
     }
 }

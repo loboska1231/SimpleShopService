@@ -4,7 +4,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -52,11 +50,11 @@ public class JwtUtil {
 	}
 
 	public String generateAccessToken(User user){
-		return generateToken(user.getUsername(),accessTokenTtlMillis, user.toMap());
+		return generateToken(user.getEmail(),accessTokenTtlMillis, user.toMap());
 	}
 
 	public String generateRefreshToken(User user){
-		return generateToken(user.getUsername(),refreshTokenTtlMillis, user.toMap());
+		return generateToken(user.getEmail(),refreshTokenTtlMillis, user.getRoles());
 	}
 	private boolean isExpired(String token){
 		Date expireAt = extractFromToken(token, Claims::getExpiration);

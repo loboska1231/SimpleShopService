@@ -1,15 +1,16 @@
 package org.project.shopservice.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.util.CollectionUtils;
 
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
@@ -23,7 +24,7 @@ public class OrderEntity {
     private Long id;
 
     private String whose;
-    private String username;
+    private String email;
     private String address;
     @Column(name="total_price")
     private BigDecimal totalPrice;

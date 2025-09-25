@@ -7,7 +7,7 @@ import org.hibernate.validator.constraints.Length;
 
 @Builder
 public record UserRegistrationDto(
-        @NonNull @NotBlank String username,
+        @NonNull @NotBlank String email,
         @NonNull @NotBlank @Length(min = 4) String password,
         @NonNull @NotBlank @Length(min = 2, max = 40) String firstName,
         @NonNull @NotBlank @Length(min = 2, max = 40) String lastName,

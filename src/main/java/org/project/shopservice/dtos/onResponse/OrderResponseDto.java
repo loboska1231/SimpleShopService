@@ -7,8 +7,9 @@ import java.time.Instant;
 import java.util.List;
 @Builder
 public record OrderResponseDto (
+		Long id,
         String whose,
-        String username,
+        String email,
         String address,
         BigDecimal total_price,
         Instant date,

@@ -3,7 +3,10 @@ package org.project.shopservice.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor

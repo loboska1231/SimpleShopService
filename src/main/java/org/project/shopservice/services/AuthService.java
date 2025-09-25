@@ -25,7 +25,7 @@ public class AuthService implements UserDetailsService {
     private final JwtUtil jwtUtil;
 
     public TokensDto authenticateUser( UserAuthDto dto) {
-        User user = userRepository.findByUsername(dto.username()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        User user = userRepository.findByEmail(dto.email()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         if(passwordEncoder.matches(dto.password(), user.getPassword())){
             return generator(user);
         }
@@ -38,7 +38,7 @@ public class AuthService implements UserDetailsService {
                 .lastName(dto.lastName())
                 .role("USER")
                 .password(passwordEncoder.encode(dto.password()))
-                .username(dto.username())
+                .email(dto.email())
                 .build();
 
         return generator(user);
@@ -47,7 +47,7 @@ public class AuthService implements UserDetailsService {
     public TokensDto refreshToken(String refreshToken) {
         if(StringUtils.isNotBlank(refreshToken)){
             String username = jwtUtil.extractUsername(refreshToken);
-            User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            User user = userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
             if(user.getRefreshToken().equals(refreshToken)) return generator(user);
             else throw new JwtException("Wrong token");
         }
@@ -56,7 +56,7 @@ public class AuthService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username)
+        return userRepository.findByEmail(username)
                 .orElseThrow(()-> new UsernameNotFoundException("Not found user with '%s'".formatted(username)));
     }
 

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+    <html xmlns:th="http://www.thymeleaf.org">
+        <head>
+            <meta charset="UTF-8">
+            <title>Order Created</title>
+            <style>
+                body {
+                    margin: 2rem;
+                    font-family: "Droid Sans", sans-serif;
+                }
+                h1, h2 {
+                    color: #333;
+                }
+                .order-info {
+                    margin-bottom: 1.5rem;
+                    padding-left: 1.5rem;
+                }
+                .order-info p {
+                    margin: 0.3rem 0;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 1rem;
+                }
+                table, th, td {
+                    border: 1px solid #aaa;
+                }
+                th, td {
+                    padding: 0.5rem;
+                    text-align: left;
+                }
+                th {
+                    background-color: #f3f3f3;
+                }
+                .status {
+                    font-weight: bold;
+                    padding: 0.2rem 0.6rem;
+                    border-radius: 4px;
+                }
+                .status.CREATED { background: #d4edda; color: #155724; }
+                .status.DELETED  { background: #f8d7da; color: #721c24; }
+                .status.UPDATED   { background: #5f95f4; color: #ffffff; }
+            </style>
+        </head>
+        <body>
+            <header>
+                <h1>Order Created</h1>
+                <p>Hi, <strong><span th:text="${whose}"></span></strong> you have created an Order! </p>
+                <p>In the future, our team, (me and me), are going to add items-info in this letter</p>
+                <p>see ya soon!</p>
+            </header>
+            <main>
+                <h2>Order Details</h2>
+
+                <div class="order-info" >
+                    <p><strong>Customer:</strong> <span th:text="${whose}"></span></p>
+                    <p><strong>Email:</strong> <span th:text="${email}"></span></p>
+                    <p><strong>Address:</strong> <span th:text="${address}"></span></p>
+                    <p><strong>Total Price:</strong>
+                        <span th:text="${totalPrice}"></span>
+                    </p>
+                    <p><strong>Date:</strong> <span th:text="${date}"></span></p>
+                    <p><strong>Status:</strong>
+                        <span th:class="'status ' + ${status}" th:text="${status}"></span>
+                    </p>
+                </div>
+
+                <h2>Order Items Details</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product ID</th>
+                            <th>Price</th>
+                            <th>Amount</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr th:each="item : ${items}">
+                            <td th:text="${item.productId}"></td>
+                            <td th:text="${item.price}"></td>
+                            <td th:text="${item.amount}"></td>
+                            <td th:text="${item.totalPrice}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </main>
+
+        </body>
+    </html>

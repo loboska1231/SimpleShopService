@@ -119,3 +119,12 @@ databaseChangeLog:
             oldColumnName: email
             newColumnName: username
 
+  - changeSet:
+      id: "1.3.a"
+      author: "Borys"
+      changes:
+        - renameColumn:
+            tableName: orders
+            oldColumnName: username
+            newColumnName: email
+

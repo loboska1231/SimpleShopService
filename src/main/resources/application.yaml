@@ -18,12 +18,15 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    password: suskovboris@gmail.com
-    username: ${mail-password}
+    username: suskovboris@gmail.com
+    password: ${mail-password}
     properties:
       mail:
         smtp:
           auth: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
           starttls:
             enable: true
 jwt:
