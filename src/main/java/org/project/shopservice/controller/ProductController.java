@@ -9,6 +9,7 @@ import org.project.shopservice.services.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -18,8 +19,12 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public ResponseEntity<List<ProductResponseDto>> getAllProducts() { // permit all
-        return ResponseEntity.ok(productService.findProducts());
+    public ResponseEntity<List<ProductResponseDto>> getAllProducts(
+			@RequestParam(required = false) BigDecimal min,
+			@RequestParam(required = false) BigDecimal max,
+			@RequestParam(required = false) String category
+			) { // permit all
+        return ResponseEntity.ok(productService.findProducts(min,max,category));
     }
     @PostMapping
     public ResponseEntity<ProductResponseDto> createProduct(@Valid @RequestBody CreateProductDto dto){

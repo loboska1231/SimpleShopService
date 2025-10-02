@@ -63,7 +63,6 @@ public class OrderService {
         orderRepository.delete(order);
     }
 
-
     public OrderResponseDto updateOrder(Integer order_id, UpdateOrderDto dto) {
         OrderEntity order = orderRepository.findById(order_id).orElseThrow();   // NoSuchElementException
         deleteItems(order, dto);
@@ -76,17 +75,17 @@ public class OrderService {
         sendTemplate(save,"Order updated!", "order-updated");
         return orderMapper.toDto(save);
     }
-        private OrderEntity deleteItems(OrderEntity order, UpdateOrderDto dto){
-            Set<String> idsToDelete = new HashSet<>(dto.onDelete());
-            Set<String> idsToUpdate = dto.updateItems().stream().map(UpdateOrderItemDto::productId).collect(Collectors.toSet());
-            boolean contains = !Collections.disjoint(idsToDelete, idsToUpdate);
-            if(!contains) {
-                List<OrderItemEntity> items = order.getItems();
-                idsToDelete.forEach(id -> items.removeIf(item -> item.getProductId().equals(id)));
-                order.setItems(items);
-            }
-            return order;
+    private OrderEntity deleteItems(OrderEntity order, UpdateOrderDto dto){
+        Set<String> idsToDelete = new HashSet<>(dto.onDelete());
+        Set<String> idsToUpdate = dto.updateItems().stream().map(UpdateOrderItemDto::productId).collect(Collectors.toSet());
+        boolean contains = !Collections.disjoint(idsToDelete, idsToUpdate);
+        if(!contains) {
+            List<OrderItemEntity> items = order.getItems();
+            idsToDelete.forEach(id -> items.removeIf(item -> item.getProductId().equals(id)));
+            order.setItems(items);
         }
+        return order;
+    }
 
     private OrderEntity loadOrderItemsInfo(OrderEntity order) {
         List<OrderItemEntity> items = order.getItems();
@@ -101,6 +100,7 @@ public class OrderService {
         }
         return order;
     }
+
     private void sendTemplate(OrderEntity order, String subject, String templateName) {
         emailService.sendEmail(SendEmailDto.builder()
                 .to(order.getEmail())

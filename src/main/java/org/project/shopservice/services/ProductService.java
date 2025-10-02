@@ -9,6 +9,8 @@ import org.project.shopservice.models.Product;
 import org.project.shopservice.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,8 +27,26 @@ public class ProductService {
         return productMapper.toResponse(save);
     }
 
-    public List<ProductResponseDto> findProducts() {
-        return productRepository.findAll().stream().map(productMapper::toResponse).toList();
+    public List<ProductResponseDto> findProducts(BigDecimal min, BigDecimal max, String category) {
+		List<Product> products ;
+		if(min !=null && max!=null && category!=null){
+			products = productRepository.findAllWherePriceLessThanEqualAndPriceGreaterThanEqualAndCategoryIsIgnoreCase(min,max,category);
+		} else if (min != null && max != null ) {
+
+			if(max.compareTo(min) < 0) return Collections.emptyList();
+
+			products = productRepository.findAllWherePriceLessThanEqualAndPriceGreaterThanEqual(min,max);
+		}  else if (min != null && category != null) {
+			products = productRepository.findAllWherePriceLessThanEqualAndCategoryIsIgnoreCase(min,category);
+		} else if (max != null && category != null ) {
+			products = productRepository.findAllWherePriceGreaterThanEqualAndCategoryIsIgnoreCase(max,category);
+		} else if (min != null ) {
+			products = productRepository.findAllWherePriceLessThanEqual(min);
+		} else if (max != null ) {
+			products = productRepository.findAllWherePriceGreaterThanEqual(max);
+		}
+		else products = productRepository.findAll();
+	    return products.stream().map(productMapper::toResponse).toList();
     }
 
     public Optional<ProductResponseDto> findProductById(String id) {
@@ -34,10 +54,10 @@ public class ProductService {
     }
 
     public Optional<ProductResponseDto> updateProduct(String id, UpdateProductDto dto) {
-        return productRepository
-                .findById(id)
-                .map(product -> productMapper.updateEntity(product, dto))
-                .map(productMapper::toResponse);
+	    return productRepository
+			    .findById(id)
+			    .map(product -> productMapper.updateEntity(product, dto))
+			    .map(productMapper::toResponse);
     }
 
     public void deleteProductById(String id) {

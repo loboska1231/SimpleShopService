@@ -60,7 +60,7 @@
                     <p><strong>Total Price:</strong>
                         <span th:text="${totalPrice}"></span>
                     </p>
-                    <p><strong>Date:</strong> <span th:text="${date}"></span></p>
+                    <p><strong>Date:</strong> <span th:text="${#dates.format(date, 'dd-MM-yyyy HH:mm')} , ${#dates.dayOfWeek(date)}"></span></p>
                     <p><strong>Status:</strong>
                         <span th:class="'status ' + ${status}" th:text="${status}"></span>
                     </p>
