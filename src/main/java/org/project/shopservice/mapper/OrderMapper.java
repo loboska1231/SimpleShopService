@@ -11,9 +11,13 @@ import org.project.shopservice.dtos.onResponse.OrderItemResponseDto;
 import org.project.shopservice.dtos.onResponse.OrderResponseDto;
 import org.project.shopservice.entities.OrderEntity;
 import org.project.shopservice.entities.OrderItemEntity;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
@@ -33,19 +37,25 @@ public interface OrderMapper {
     OrderItemResponseDto toItemDto(OrderItemEntity orderItem);
 
     default OrderEntity updateOrder(@MappingTarget OrderEntity order , UpdateOrderDto dto){
-        order.setStatus("UPDATED");
-        order.setAddress(dto.address());
-        List<OrderItemEntity> items = order.getItems();
-        List<UpdateOrderItemDto> dtoItems = dto.updateItems();
-        items.forEach(item->{
-            dtoItems.forEach(dtoItem->{
-                if(item.getProductId().equals(dtoItem.productId())){
-                    item.setAmount(dtoItem.amount());
-                } else{
-                    items.add(toItemEntity(dtoItem));
-                }
-            });
-        });
+        if(!ObjectUtils.isEmpty(dto)){
+            order.setStatus("UPDATED");
+            order.setAddress(dto.address());
+            List<UpdateOrderItemDto> dtoItems = dto.updateItems();
+            if(!CollectionUtils.isEmpty(dtoItems)){
+                List<OrderItemEntity> items = order.getItems();
+                List<String> productIds = order.getItems().stream().map(OrderItemEntity::getProductId).toList();
+                items.forEach(item->{
+                    dtoItems.forEach(dtoItem->{
+                        if(item.getProductId().equals(dtoItem.productId()) && dtoItem.amount() >0 ) {
+                            item.setAmount(dtoItem.amount());
+                        }
+                        if(!productIds.contains(dtoItem.productId()) ){
+                            items.add(toItemEntity(dtoItem));
+                        }
+                    });
+                });
+            }
+        }
         return order;
     }
 }

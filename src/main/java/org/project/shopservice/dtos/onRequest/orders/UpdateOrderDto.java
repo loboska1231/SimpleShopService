@@ -1,6 +1,7 @@
 package org.project.shopservice.dtos.onRequest.orders;
 
 import lombok.Builder;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -10,4 +11,7 @@ public record UpdateOrderDto(
         List<String> onDelete,
         List<UpdateOrderItemDto> updateItems
 ){
+	public boolean isEmpty(){
+		return CollectionUtils.isEmpty(onDelete) &&  CollectionUtils.isEmpty(updateItems) && address==null;
+	}
 }

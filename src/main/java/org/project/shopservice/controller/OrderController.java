@@ -28,7 +28,7 @@ public class OrderController {
     }
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponseDto> getOrder(@PathVariable Integer id) {
-        return ResponseEntity.ok(orderService.findOrderById(id).orElseThrow());
+        return ResponseEntity.ok(orderService.findOrderById(id));
     }
     @PatchMapping("/{id}")
     public ResponseEntity<OrderResponseDto> updateOrder(@PathVariable Integer id, @Valid @RequestBody UpdateOrderDto dto) {

@@ -12,10 +12,13 @@ import org.project.shopservice.entities.OrderEntity;
 import org.project.shopservice.entities.OrderItemEntity;
 import org.project.shopservice.mapper.OrderMapper;
 import org.project.shopservice.mapper.ProductMapper;
+import org.project.shopservice.models.Product;
 import org.project.shopservice.repository.OrderRepository;
 import org.project.shopservice.repository.ProductRepository;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.util.*;
 import java.util.function.Function;
@@ -47,52 +50,72 @@ public class OrderService {
         userService.fillFieldsEmailAndWhose(order);
         OrderEntity save = orderRepository.save(order);
 
-        sendTemplate(order,"Order Created!", "order-created");
+        sendTemplate(order,"Order Created!", "order-notification");
 
         return orderMapper.toDto(save);
     }
 
-    public Optional<OrderResponseDto> findOrderById(Integer id) {
-        return  orderRepository.findById(id).map(orderMapper::toDto);
+    public OrderResponseDto findOrderById(Integer id) {
+        Optional<OrderEntity> order = orderRepository.findById(id);
+        return order.isPresent() ? order.map(orderMapper::toDto).get() : null;
     }
 
     public void deleteOrderById(Integer id) {
-        OrderEntity order = orderRepository.findById(id).get();
-        order.setStatus("DELETED");
-        sendTemplate(order,"Order Deleted!", "order-deleted");
-        orderRepository.delete(order);
+        Optional<OrderEntity> order = orderRepository.findById(id);
+        if(order.isPresent()) {
+            order.get().setStatus("DELETED");
+            sendTemplate(order.get(),"Order Deleted!", "order-notification");
+            orderRepository.delete(order.get());
+        }
     }
 
     public OrderResponseDto updateOrder(Integer order_id, UpdateOrderDto dto) {
         OrderEntity order = orderRepository.findById(order_id).orElseThrow();   // NoSuchElementException
-        deleteItems(order, dto);
-        orderMapper.updateOrder(order, dto);
-        loadOrderItemsInfo(order);
-        order.setTotal();
-        order.assignOrder();
-        OrderEntity save = orderRepository.save(order);
+	    if(!dto.isEmpty()){
+		    deleteItems(order, dto);
+		    loadOrderItemsInfo(order);
+		    orderMapper.updateOrder(order, dto);
+		    order.setTotal();
+		    order.assignOrder();
+		    OrderEntity save = orderRepository.save(order);
 
-        sendTemplate(save,"Order updated!", "order-updated");
-        return orderMapper.toDto(save);
+		    sendTemplate(save,"Order updated!", "order-notification");
+		    return orderMapper.toDto(save);
+	    }
+        else return orderMapper.toDto(order);
     }
-    private OrderEntity deleteItems(OrderEntity order, UpdateOrderDto dto){
-        Set<String> idsToDelete = new HashSet<>(dto.onDelete());
-        Set<String> idsToUpdate = dto.updateItems().stream().map(UpdateOrderItemDto::productId).collect(Collectors.toSet());
-        boolean contains = !Collections.disjoint(idsToDelete, idsToUpdate);
-        if(!contains) {
-            List<OrderItemEntity> items = order.getItems();
-            idsToDelete.forEach(id -> items.removeIf(item -> item.getProductId().equals(id)));
-            order.setItems(items);
-        }
-        return order;
-    }
+	private OrderEntity deleteItems(OrderEntity order, UpdateOrderDto dto){
+		boolean emptyIdsToDdelete = CollectionUtils.isEmpty(dto.onDelete());
+		boolean emptyIdsToUpdate = CollectionUtils.isEmpty(dto.updateItems());
+		if(!emptyIdsToDdelete ) {
+			Set<String> idsToDelete = new HashSet<>(dto.onDelete());
+			Set<String> idsToUpdate =
+					!emptyIdsToUpdate
+							? dto.updateItems()
+							.stream()
+							.map(UpdateOrderItemDto::productId)
+							.collect(Collectors.toSet())
+							: Collections.emptySet();
+
+			boolean contains = !Collections.disjoint(idsToDelete, idsToUpdate);
+			if(!contains) {
+				List<OrderItemEntity> items = order.getItems();
+				idsToDelete.forEach(id -> items.removeIf(item -> item.getProductId().equals(id)));
+				order.setItems(items);
+			}
+		}
+		return order;
+	}
 
     private OrderEntity loadOrderItemsInfo(OrderEntity order) {
         List<OrderItemEntity> items = order.getItems();
         if(!CollectionUtils.isEmpty(items)) {
             Set<String> ids = items.stream().map(OrderItemEntity::getProductId).collect(Collectors.toSet());
-            Map<String, ProductResponseDto> products = productRepository.findAllByIdIn(ids)
-                    .stream()
+            List<Product> listOfFoundProducts = productRepository.findAllByIdIn(ids);
+            if(listOfFoundProducts.isEmpty()){
+                throw new IllegalArgumentException("No products with these ids : " + ids);
+            }
+            Map<String, ProductResponseDto> products = listOfFoundProducts.stream()
                     .map(productMapper::toResponse)
                     .collect(Collectors.toMap(ProductResponseDto::id, Function.identity()));
             items.forEach(item -> item.setPrice(products.get(item.getProductId()).price()));
