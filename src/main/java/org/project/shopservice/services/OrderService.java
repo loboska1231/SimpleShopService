@@ -15,10 +15,8 @@ import org.project.shopservice.mapper.ProductMapper;
 import org.project.shopservice.models.Product;
 import org.project.shopservice.repository.OrderRepository;
 import org.project.shopservice.repository.ProductRepository;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
 
 import java.util.*;
 import java.util.function.Function;
@@ -43,16 +41,21 @@ public class OrderService {
     }
 
     public OrderResponseDto createOrder(CreateOrderDto dto) {
-        OrderEntity order = orderMapper.toEntity(dto);
-        loadOrderItemsInfo(order);
-        order.setTotal();
-        order.assignOrder();
-        userService.fillFieldsEmailAndWhose(order);
-        OrderEntity save = orderRepository.save(order);
-
-        sendTemplate(order,"Order Created!", "order-notification");
-
-        return orderMapper.toDto(save);
+		OrderResponseDto response = null;
+        if(!dto.hasEmptyFields()){
+	        CreateOrderDto tidiedDto = dto.tidyOrNull();
+			if(tidiedDto!=null){
+				OrderEntity order = orderMapper.toEntity(tidiedDto);
+				loadOrderItemsInfo(order);
+				order.setTotal();
+				order.assignOrder();
+				userService.fillFieldsEmailAndWhose(order);
+				OrderEntity save = orderRepository.save(order);
+				sendTemplate(order,"Order Created!", "order-notification");
+				response = orderMapper.toDto(save);
+			}
+        }
+		 return response;
     }
 
     public OrderResponseDto findOrderById(Integer id) {
@@ -85,23 +88,25 @@ public class OrderService {
         else return orderMapper.toDto(order);
     }
 	private OrderEntity deleteItems(OrderEntity order, UpdateOrderDto dto){
-		boolean emptyIdsToDdelete = CollectionUtils.isEmpty(dto.onDelete());
-		boolean emptyIdsToUpdate = CollectionUtils.isEmpty(dto.updateItems());
-		if(!emptyIdsToDdelete ) {
-			Set<String> idsToDelete = new HashSet<>(dto.onDelete());
-			Set<String> idsToUpdate =
-					!emptyIdsToUpdate
-							? dto.updateItems()
-							.stream()
-							.map(UpdateOrderItemDto::productId)
-							.collect(Collectors.toSet())
-							: Collections.emptySet();
+		if(!CollectionUtils.isEmpty(order.getItems())){
+			boolean emptyToDdelete = CollectionUtils.isEmpty(dto.onDelete());
+			boolean emptyToUpdate = CollectionUtils.isEmpty(dto.updateItems());
+			if(!emptyToDdelete ) {
+				Set<String> idsToDelete = new HashSet<>(dto.onDelete());
+				Set<String> idsToUpdate =
+						!emptyToUpdate
+								? dto.updateItems()
+								.stream()
+								.map(UpdateOrderItemDto::productId)
+								.collect(Collectors.toSet())
+								: Collections.emptySet();
 
-			boolean contains = !Collections.disjoint(idsToDelete, idsToUpdate);
-			if(!contains) {
-				List<OrderItemEntity> items = order.getItems();
-				idsToDelete.forEach(id -> items.removeIf(item -> item.getProductId().equals(id)));
-				order.setItems(items);
+				boolean contains = !Collections.disjoint(idsToDelete, idsToUpdate);
+				if(!contains) {
+					List<OrderItemEntity> items = order.getItems();
+					idsToDelete.forEach(id -> items.removeIf(item -> item.getProductId().equals(id)));
+					order.setItems(items);
+				}
 			}
 		}
 		return order;

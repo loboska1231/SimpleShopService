@@ -165,6 +165,19 @@ class OrderServiceTest {
 						.build()),
 				Arguments.of(
 						UpdateOrderDto.builder()
+						.address("new one")
+						.onDelete(Collections.emptyList())
+						.updateItems(List.of(
+								new UpdateOrderItemDto("0001", 0L)
+						))
+						.build()),
+				Arguments.of(
+						UpdateOrderDto.builder()
+						.address("new one")
+						.onDelete(List.of("0003","0001","0002"))
+						.build()),
+				Arguments.of(
+						UpdateOrderDto.builder()
 								.address("new one")
 								.build())
 		);
@@ -175,13 +188,31 @@ class OrderServiceTest {
 		when(orderRepository.findById(any()))
 				.thenReturn(Optional.of(order1));
 
-		when(productRepository.findAllByIdIn(anySet()))
+		lenient().when(productRepository.findAllByIdIn(anySet()))
 				.thenReturn(products);
 
 		when(orderRepository.save(any(OrderEntity.class)))
 				.thenReturn(order1);
 		assertDoesNotThrow(()->orderService.updateOrder(1,dto));
 		verify(orderRepository,times(1)).findById(any(Integer.class));
+	}
+	@Test
+	void testUpdateOrder_twice(){
+		UpdateOrderDto dto = UpdateOrderDto.builder()
+				.address("new one")
+				.onDelete(List.of("0003", "0001", "0002"))
+				.build();
+		when(orderRepository.findById(any()))
+				.thenReturn(Optional.of(order1));
+
+		lenient().when(productRepository.findAllByIdIn(anySet()))
+				.thenReturn(Collections.emptyList());
+
+		when(orderRepository.save(any(OrderEntity.class)))
+				.thenReturn(order1);
+		orderService.updateOrder(1,dto);
+		orderService.updateOrder(1,dto);
+		verify(orderRepository,times(2)).findById(any(Integer.class));
 	}
 	@Test
 	void testUpdateOrder_nullDto() {
@@ -198,5 +229,52 @@ class OrderServiceTest {
 	void testUpdateOrder_expectingNoSuchElementException(){
 		assertThrowsExactly(NoSuchElementException.class,()->orderService.updateOrder(3,null));
 		verify(orderRepository,times(0)).save(any(OrderEntity.class));
+	}
+
+	@Test
+	void testCreateOrder(){
+		when(orderMapper.toEntity(any()))
+				.thenReturn(order1);
+
+		when(productRepository.findAllByIdIn(anySet()))
+				.thenReturn(products);
+
+		when(userService.fillFieldsEmailAndWhose(any(OrderEntity.class)))
+				.thenReturn(order1);
+		when(orderRepository.save(any(OrderEntity.class)))
+				.thenReturn(order1);
+		assertDoesNotThrow(()->orderService.createOrder(createOrderDto));
+		assertNotNull(orderService.createOrder(createOrderDto));
+		verify(orderRepository,times(2)).save(any(OrderEntity.class));
+	}
+	static Stream<Arguments> createOrder(){
+		return Stream.of(
+				Arguments.of(CreateOrderDto.builder().address(" ").items(List.of()).build()),
+				Arguments.of(CreateOrderDto.builder().address(" ").items(List.of(CreateOrderItemDto.builder().build())).build()),
+				Arguments.of(CreateOrderDto.builder().address("t").items(List.of()).build()),
+				Arguments.of(CreateOrderDto.builder().address("t").items(List.of(CreateOrderItemDto.builder().build())).build())
+		);
+	}
+	@ParameterizedTest
+	@MethodSource("createOrder")
+	void testCreateOrder_expectingNull(CreateOrderDto nullDto){
+		assertDoesNotThrow(()->orderService.createOrder(nullDto));
+		assertNull(orderService.createOrder(nullDto));
+		verifyNoInteractions(orderRepository);
+	}
+
+	@Test
+	void testCreateOrder_expectingIllegalArgs(){
+		var dto = CreateOrderDto
+				.builder()
+				.address("t")
+				.items(List.of(CreateOrderItemDto
+						.builder()
+								.productId("001")
+								.amount(5L)
+						.build()))
+				.build();
+		assertThrowsExactly(IllegalArgumentException.class,()->orderService.createOrder(dto));
+		verifyNoInteractions(orderRepository);
 	}
 }
