@@ -1,5 +1,6 @@
 package org.project.shopservice.dtos.onRequest.users;
 
+import io.micrometer.common.util.StringUtils;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.NonNull;
@@ -13,4 +14,10 @@ public record UserRegistrationDto(
         @NonNull @NotBlank @Length(min = 2, max = 40) String lastName,
         String role
 ) {
+	public boolean hasEmptyRequiredFields(){
+		return StringUtils.isBlank(email)
+				|| StringUtils.isBlank(password)
+				|| StringUtils.isBlank(firstName)
+				|| StringUtils.isBlank(lastName);
+	}
 }

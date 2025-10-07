@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
@@ -24,11 +25,11 @@ public class User implements UserDetails {
 	private String firstName;
 	private String lastName;
 	private String refreshToken;
-	private String role;
+	private Set<String> roles;
 
 	public Collection<? extends GrantedAuthority> getAuthorities(){
-		if(StringUtils.isNotBlank(role)){
-			return Set.of(new SimpleGrantedAuthority(role));
+		if(!roles.isEmpty()){
+			return roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toSet());
 		} else return Collections.emptySet();
 	}
 
