@@ -30,20 +30,20 @@ public class ProductService {
     public List<ProductResponseDto> findProducts(BigDecimal min, BigDecimal max, String category) {
 		List<Product> products ;
 		if(min !=null && max!=null && category!=null){
-			products = productRepository.findAllWherePriceLessThanEqualAndPriceGreaterThanEqualAndCategoryIsIgnoreCase(min,max,category);
+			products = productRepository.findAllByPriceGreaterThanEqualAndPriceLessThanEqualAndCategoryIsIgnoreCase(min,max,category);
 		} else if (min != null && max != null ) {
 
 			if(max.compareTo(min) < 0) return Collections.emptyList();
 
-			products = productRepository.findAllWherePriceLessThanEqualAndPriceGreaterThanEqual(min,max);
+			products = productRepository.findAllByPriceGreaterThanEqualAndPriceLessThanEqual(min,max);
 		}  else if (min != null && category != null) {
-			products = productRepository.findAllWherePriceLessThanEqualAndCategoryIsIgnoreCase(min,category);
+			products = productRepository.findAllByPriceLessThanEqualAndCategoryIsIgnoreCase(min,category);
 		} else if (max != null && category != null ) {
-			products = productRepository.findAllWherePriceGreaterThanEqualAndCategoryIsIgnoreCase(max,category);
+			products = productRepository.findAllByPriceGreaterThanEqualAndCategoryIsIgnoreCase(max,category);
 		} else if (min != null ) {
-			products = productRepository.findAllWherePriceLessThanEqual(min);
+			products = productRepository.findAllByPriceLessThanEqual(min);
 		} else if (max != null ) {
-			products = productRepository.findAllWherePriceGreaterThanEqual(max);
+			products = productRepository.findAllByPriceGreaterThanEqual(max);
 		}
 		else products = productRepository.findAll();
 	    return products.stream().map(productMapper::toResponse).toList();

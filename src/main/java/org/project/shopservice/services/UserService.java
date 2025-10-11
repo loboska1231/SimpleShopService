@@ -1,6 +1,7 @@
 package org.project.shopservice.services;
 
 
+import io.jsonwebtoken.JwtException;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.project.shopservice.entities.OrderEntity;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserService {
 	private final UserRepository userRepository;
-	private final JwtUtil jwtUtil;
 
 	private String extractFullName(){
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -23,14 +23,16 @@ public class UserService {
 			User user = userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 			return user.getFirstName()+" "+user.getLastName();
 		}
-		return null;
+		throw new JwtException("username is empty");
 	}
 	private String extractUsername(){
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
-		if(StringUtils.isNotBlank(username) && userRepository.findByEmail(username).isPresent()){
-			return username;
+		if(StringUtils.isNotBlank(username)){
+			if(userRepository.findByEmail(username).isPresent())
+				return username;
+			else throw new UsernameNotFoundException("User not found");
 		}
-		return null;
+		throw new JwtException("username is empty");
 	}
 
 	public OrderEntity fillFieldsEmailAndWhose(OrderEntity order){

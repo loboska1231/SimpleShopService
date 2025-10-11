@@ -5,9 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.math.BigDecimal;
+
+import static org.springframework.data.mongodb.core.mapping.FieldType.DECIMAL128;
+
 
 @Data
 @AllArgsConstructor
@@ -20,6 +24,7 @@ public class Product {
 
     private String category;
 
+//    @Field(targetType=DECIMAL128)
     private BigDecimal price;
 
     private String type;

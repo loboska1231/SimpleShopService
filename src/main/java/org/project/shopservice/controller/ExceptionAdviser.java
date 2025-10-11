@@ -2,6 +2,7 @@ package org.project.shopservice.controller;
 
 import io.jsonwebtoken.JwtException;
 import org.project.shopservice.dtos.onResponse.ErrorDto;
+import org.project.shopservice.exceptions.UserAlreadyExistException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,6 +24,7 @@ public class ExceptionAdviser {
 	// NoSuchElementException
 	// UsernameNotFoundException
 	// JwtException
+	// UserAlreadyExistException
 	// *
 
 	@ExceptionHandler(NullPointerException.class)
@@ -39,6 +41,22 @@ public class ExceptionAdviser {
 						.build()
 					);
 	}
+
+	@ExceptionHandler(UserAlreadyExistException.class)
+	public ResponseEntity<ErrorDto>handleUserAlreadyExistException(UserAlreadyExistException e){
+		Map<String, Object> details = new HashMap<>();
+		details.put("message", e.getMessage());
+
+		return ResponseEntity.status(HttpStatus.CONFLICT)
+				.body(
+						ErrorDto.builder()
+								.date(Instant.now())
+								.exceptionType("UserAlreadyExistException")
+								.details(details)
+								.build()
+				);
+	}
+
 	@ExceptionHandler(IllegalArgumentException.class)
 	public ResponseEntity<ErrorDto>handleIllegalArgumentException(IllegalArgumentException e){
 		Map<String, Object> details = new HashMap<>();
@@ -82,7 +100,8 @@ public class ExceptionAdviser {
 
 	@ExceptionHandler(JwtException.class)
 	public ResponseEntity<ErrorDto>handleJwtException(JwtException e){
-		Map<String, Object> details = getDetails(e);
+		Map<String, Object> details = new HashMap<>(Map.of("message", e.getMessage()));
+
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 				.body(
 						ErrorDto.builder()

@@ -2,7 +2,7 @@ spring:
   application:
     name: ShopService
   datasource:
-    url: jdbc:postgresql://psql-service:5432/orders_db
+    url: jdbc:postgresql://localhost:5432/orders_db
     username: psql
     password: psql
   jpa:
@@ -10,11 +10,9 @@ spring:
       ddl-auto: update
   data:
     mongodb:
-      uri: mongodb://mongo-service:27017/mongo_db
-
+      uri: mongodb://localhost:27017/mongo_db
 #  liquibase:
 #    enabled: false
-
   mail:
     host: smtp.gmail.com
     port: 587
@@ -35,5 +33,6 @@ jwt:
     ttl-millis: 60000
   refresh-token:
     ttl-millis: 900000
+
 server:
   port: 8080

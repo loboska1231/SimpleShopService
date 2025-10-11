@@ -3,7 +3,9 @@ package org.project.shopservice.services;
 import io.jsonwebtoken.JwtException;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.project.shopservice.exceptions.UserAlreadyExistException;
 import org.project.shopservice.dtos.onRequest.users.UserAuthDto;
 import org.project.shopservice.dtos.onRequest.users.UserRegistrationDto;
 import org.project.shopservice.dtos.onResponse.TokensDto;
@@ -69,17 +71,23 @@ public class AuthService implements UserDetailsService {
                 .orElseThrow(()-> new UsernameNotFoundException("Not found user with '%s'".formatted(username)));
     }
 
+    @SneakyThrows
     private TokensDto generator(User user){
         if(user != null){
-            String accessToken = jwtUtil.generateAccessToken(user);
-            String refreshToken = jwtUtil.generateRefreshToken(user);
-            user.setRefreshToken(refreshToken);
+            if(userRepository.findByEmail(user.getEmail()).isPresent()){
+                throw new UserAlreadyExistException("User with email " + user.getEmail() + " already exists");
+            }
+            else{
+                String accessToken = jwtUtil.generateAccessToken(user);
+                String refreshToken = jwtUtil.generateRefreshToken(user);
+                user.setRefreshToken(refreshToken);
 
-            userRepository.save(user);
-            return TokensDto.builder()
-                    .accessToken(accessToken)
-                    .refreshToken(refreshToken)
-                    .build();
+                userRepository.save(user);
+                return TokensDto.builder()
+                        .accessToken(accessToken)
+                        .refreshToken(refreshToken)
+                        .build();
+            }
         } else throw new IllegalArgumentException("Object has Empty fields!");
     }
 }

@@ -193,7 +193,7 @@ class AuthServiceTest {
 				.firstName("test")
 				.lastName("testing")
 				.build();
-		TokensDto tokens = authService.registrateUser(dto);
+		var tokens = authService.registrateUser(dto);
 
 		assertNull(tokens);
 	}
