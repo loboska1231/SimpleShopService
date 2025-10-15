@@ -1,5 +1,6 @@
 package org.project.shopservice.repository;
 
+import org.bson.types.Decimal128;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -9,14 +10,14 @@ import org.project.shopservice.config.TestContainersConfig;
 import org.project.shopservice.models.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.index.TextIndexed;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
+
 
 @SpringBootTest(classes = TestContainersConfig.class)
 class ProductRepositoryTest {
@@ -65,8 +66,8 @@ class ProductRepositoryTest {
 				Arguments.of(100, 2000, "testing"),
 				Arguments.of(150, 500, "tesTING 1"),
 				Arguments.of(300, 900, "TESTing 2"),
-				Arguments.of(400, 700, "testIng"),
-				Arguments.of(500, 600, "testinG"),
+				Arguments.of(900, 7000, "testIng"),
+				Arguments.of(1400, 1600, "testinG"),
 				Arguments.of(750, 950, "TESTING 3"),
 				Arguments.of(1000,2000,"testing"),
 				Arguments.of(200, 500, "CASting"),
@@ -76,9 +77,30 @@ class ProductRepositoryTest {
 	@ParameterizedTest
 	@MethodSource("testFindAllByPriceLTEandGTEAndCategoryIsIgnoreCase")
 	void findAllByPriceGreaterThanEqualAndPriceLessThanEqualAndCategoryIsIgnoreCase(int min, int max, String category){
-		assertFalse(productRepository.findAllByPriceGreaterThanEqualAndPriceLessThanEqualAndCategoryIsIgnoreCase(BigDecimal.valueOf(min),BigDecimal.valueOf(max),category).isEmpty());
+		assertFalse(productRepository.findAllByPriceGreaterThanEqualAndPriceLessThanEqualAndCategoryIsIgnoreCase(new Decimal128(min),new Decimal128(max),category).isEmpty());
 
 	}
+
+	static Stream<Arguments> testFindAllByPriceLTEandGTEAndCategoryIsIgnoreCase_expectingEmpty(){
+		return Stream.of(
+				Arguments.of(0, 50, "testing"),
+				Arguments.of(150, 50, "tesTING 1"),
+				Arguments.of(500, -1, "TESTing 2"),
+				Arguments.of(10000, 70000, "testIng"),
+				Arguments.of(0, 0, "testinG"),
+				Arguments.of(750, 950, "TES"),
+				Arguments.of(1000,2000,"test1ng"),
+				Arguments.of(200, 500, "CAS ting"),
+				Arguments.of(100, 150, "testing ")
+		);
+	}
+	@ParameterizedTest
+	@MethodSource("testFindAllByPriceLTEandGTEAndCategoryIsIgnoreCase_expectingEmpty")
+	void findAllByPriceGreaterThanEqualAndPriceLessThanEqualAndCategoryIsIgnoreCase_expectingEmpty(int min, int max, String category){
+		assertTrue(productRepository.findAllByPriceGreaterThanEqualAndPriceLessThanEqualAndCategoryIsIgnoreCase(new Decimal128(min),new Decimal128(max),category).isEmpty());
+
+	}
+
 	static Stream<Arguments> testFindAllByPriceLTEandGTE(){
 		return Stream.of(
 				Arguments.of(100, 1000),
@@ -89,17 +111,27 @@ class ProductRepositoryTest {
 				Arguments.of(750, 950),
 				Arguments.of(150, 250),
 				Arguments.of(200, 500),
-				Arguments.of(100, 150)
+				Arguments.of(100, 150),
+				Arguments.of(99, 151)
 		);
 	}
 	@ParameterizedTest
 	@MethodSource("testFindAllByPriceLTEandGTE")
 	void findAllByPriceGreaterThanEqualAndPriceLessThanEqual(int min, int max){
-		assertFalse(productRepository.findAllByPriceGreaterThanEqualAndPriceLessThanEqual(BigDecimal.valueOf(min),BigDecimal.valueOf(max)).isEmpty());
+		assertFalse(productRepository.findAllByPriceGreaterThanEqualAndPriceLessThanEqual(new Decimal128(BigDecimal.valueOf(min)),new Decimal128(BigDecimal.valueOf(max))).isEmpty());
 	}
-	@Test
-	void findAllByPricegteandlte(){
-		assertFalse(productRepository.findAllByPriceGreaterThanEqualAndPriceLessThanEqual(BigDecimal.valueOf(100),BigDecimal.valueOf(1000)).isEmpty());
+	static Stream<Arguments> testFindAllByPriceLTEandGTE_expectingEmpty(){
+		return Stream.of(
+				Arguments.of( 555 , 560),
+				Arguments.of( 0 , 0),
+				Arguments.of( -1 , 1),
+				Arguments.of( 1 , -1)
+		);
+	}
+	@ParameterizedTest
+	@MethodSource("testFindAllByPriceLTEandGTE_expectingEmpty")
+	void findAllByPriceGreaterThanEqualAndPriceLessThanEqual_expectingEmpty(int min, int max){
+		assertTrue(productRepository.findAllByPriceGreaterThanEqualAndPriceLessThanEqual(new Decimal128(BigDecimal.valueOf(min)),new Decimal128(BigDecimal.valueOf(max))).isEmpty());
 	}
 
 	static Stream<Arguments> testFORFindAllByPriceLTEorGTE(){
@@ -116,13 +148,30 @@ class ProductRepositoryTest {
 	@ParameterizedTest
 	@MethodSource("testFORFindAllByPriceLTEorGTE")
 	void findAllByPriceLessThanEqual(int min){
-		assertFalse(productRepository.findAllByPriceLessThanEqual(BigDecimal.valueOf(min)).isEmpty());
+		assertFalse(productRepository.findAllByPriceLessThanEqual(new Decimal128(BigDecimal.valueOf(min))).isEmpty());
 	}
 
 	@ParameterizedTest
 	@MethodSource("testFORFindAllByPriceLTEorGTE")
 	void findAllByPriceGreaterThanEqual(int min){
-		assertFalse(productRepository.findAllByPriceLessThanEqual(BigDecimal.valueOf(min)).isEmpty());
+		assertFalse(productRepository.findAllByPriceLessThanEqual(new Decimal128(BigDecimal.valueOf(min))).isEmpty());
+	}
+	static Stream<Arguments> testFORFindAllByPriceLTE_expectingEmpty(){
+		return Stream.of(
+				Arguments.of(99),
+				Arguments.of(0),
+				Arguments.of(-1)
+		);
+	}
+	@ParameterizedTest
+	@MethodSource("testFORFindAllByPriceLTE_expectingEmpty")
+	void findAllByPriceLessThanEqual_expectingEmpty(int max){
+		assertTrue(productRepository.findAllByPriceLessThanEqual(new Decimal128(BigDecimal.valueOf(max))).isEmpty());
+	}
+
+	@Test
+	void findAllByPriceGreaterThanEqual_expectingEmpty(){
+		assertFalse(productRepository.findAllByPriceLessThanEqual(new Decimal128(BigDecimal.valueOf(1501))).isEmpty());
 	}
 	static Stream<Arguments> testForfindAllByPriceLTEorGTEAndCategoryIsIgnoreCase(){
 		return Stream.of(
@@ -138,11 +187,37 @@ class ProductRepositoryTest {
 	@ParameterizedTest
 	@MethodSource("testForfindAllByPriceLTEorGTEAndCategoryIsIgnoreCase")
 	void findAllByPriceLessThanEqualAndCategoryIsIgnoreCase(int  min, String category){
-		assertFalse(productRepository.findAllByPriceLessThanEqualAndCategoryIsIgnoreCase(BigDecimal.valueOf(min),category).isEmpty());
+		assertFalse(productRepository.findAllByPriceLessThanEqualAndCategoryIsIgnoreCase(new Decimal128(BigDecimal.valueOf(min)),category).isEmpty());
 	}
 	@ParameterizedTest
 	@MethodSource("testForfindAllByPriceLTEorGTEAndCategoryIsIgnoreCase")
-	void findAllByPriceGreaterThanEqualAndCategoryIsIgnoreCase(int  min, String category){
-		assertFalse(productRepository.findAllByPriceGreaterThanEqualAndCategoryIsIgnoreCase(BigDecimal.valueOf(min),category).isEmpty());
+	void findAllByPriceGreaterThanEqualAndCategoryIsIgnoreCase(int  max, String category){
+		assertFalse(productRepository.findAllByPriceGreaterThanEqualAndCategoryIsIgnoreCase(new Decimal128(BigDecimal.valueOf(max)),category).isEmpty());
+	}
+	static Stream<Arguments> testForfindAllByPriceLTEAndCategoryIsIgnoreCase_expectingEmpty(){
+		return Stream.of(
+				Arguments.of(99 ,"testing"),
+				Arguments.of(199 ,"tesTING 1" ),
+				Arguments.of(599 ,"TESTing 2" ),
+				Arguments.of(299 ,"CaStInG")
+		);
+	}
+	@ParameterizedTest
+	@MethodSource("testForfindAllByPriceLTEAndCategoryIsIgnoreCase_expectingEmpty")
+	void findAllByPriceLessThanEqualAndCategoryIsIgnoreCase_expectingEmpty(int max, String category){
+		assertTrue(productRepository.findAllByPriceLessThanEqualAndCategoryIsIgnoreCase(new Decimal128(BigDecimal.valueOf(max)),category).isEmpty());
+	}
+	static Stream<Arguments> testForfindAllByPriceGTEAndCategoryIsIgnoreCase_expectingEmpty(){
+		return Stream.of(
+				Arguments.of(1501 ,"testing"),
+				Arguments.of(251 ,"tesTING 1" ),
+				Arguments.of(901 ,"TESTing 2" ),
+				Arguments.of(401 ,"CaStInG")
+		);
+	}
+	@ParameterizedTest
+	@MethodSource("testForfindAllByPriceGTEAndCategoryIsIgnoreCase_expectingEmpty")
+	void findAllByPriceGreaterThanEqualAndCategoryIsIgnoreCase_expectingEmpty(int  min, String category){
+		assertTrue(productRepository.findAllByPriceGreaterThanEqualAndCategoryIsIgnoreCase(new Decimal128(BigDecimal.valueOf(min)),category).isEmpty());
 	}
 }

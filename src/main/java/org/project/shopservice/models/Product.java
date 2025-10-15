@@ -24,7 +24,7 @@ public class Product {
 
     private String category;
 
-//    @Field(targetType=DECIMAL128)
+    @Field(targetType=DECIMAL128)
     private BigDecimal price;
 
     private String type;

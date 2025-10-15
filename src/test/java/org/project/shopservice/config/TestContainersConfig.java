@@ -9,11 +9,11 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @TestConfiguration
 public class TestContainersConfig {
 
-	@Bean
-	@ServiceConnection
-	PostgreSQLContainer<?> postgreSQLContainer(){
-		return new PostgreSQLContainer<>("postgres:latest");
-	}
+//	@Bean
+//	@ServiceConnection
+//	PostgreSQLContainer<?> postgreSQLContainer(){
+//		return new PostgreSQLContainer<>("postgres:latest");
+//	}
 
 	@Bean
 	@ServiceConnection

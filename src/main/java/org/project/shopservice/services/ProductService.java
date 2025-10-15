@@ -1,6 +1,7 @@
 package org.project.shopservice.services;
 
 import lombok.RequiredArgsConstructor;
+import org.bson.types.Decimal128;
 import org.project.shopservice.dtos.onRequest.products.CreateProductDto;
 import org.project.shopservice.dtos.onRequest.products.UpdateProductDto;
 import org.project.shopservice.dtos.onResponse.ProductResponseDto;
@@ -28,25 +29,25 @@ public class ProductService {
     }
 
     public List<ProductResponseDto> findProducts(BigDecimal min, BigDecimal max, String category) {
-		List<Product> products ;
+		List<Product> products;
 		if(min !=null && max!=null && category!=null){
-			products = productRepository.findAllByPriceGreaterThanEqualAndPriceLessThanEqualAndCategoryIsIgnoreCase(min,max,category);
+			products = productRepository.findAllByPriceGreaterThanEqualAndPriceLessThanEqualAndCategoryIsIgnoreCase(new Decimal128(min),new Decimal128(max),category);
 		} else if (min != null && max != null ) {
 
 			if(max.compareTo(min) < 0) return Collections.emptyList();
 
-			products = productRepository.findAllByPriceGreaterThanEqualAndPriceLessThanEqual(min,max);
-		}  else if (min != null && category != null) {
-			products = productRepository.findAllByPriceLessThanEqualAndCategoryIsIgnoreCase(min,category);
-		} else if (max != null && category != null ) {
-			products = productRepository.findAllByPriceGreaterThanEqualAndCategoryIsIgnoreCase(max,category);
+			products = productRepository.findAllByPriceGreaterThanEqualAndPriceLessThanEqual(new Decimal128(min),new Decimal128(max));
+		}  else if (max != null && category != null) {
+			products = productRepository.findAllByPriceLessThanEqualAndCategoryIsIgnoreCase(new Decimal128(max),category);
+		} else if (min != null && category != null ) {
+			products = productRepository.findAllByPriceGreaterThanEqualAndCategoryIsIgnoreCase(new Decimal128(min),category);
 		} else if (min != null ) {
-			products = productRepository.findAllByPriceLessThanEqual(min);
+			products = productRepository.findAllByPriceLessThanEqual(new Decimal128(min));
 		} else if (max != null ) {
-			products = productRepository.findAllByPriceGreaterThanEqual(max);
+			products = productRepository.findAllByPriceGreaterThanEqual(new Decimal128(max));
 		}
 		else products = productRepository.findAll();
-	    return products.stream().map(productMapper::toResponse).toList();
+		return products.stream().map(productMapper::toResponse).toList();
     }
 
     public Optional<ProductResponseDto> findProductById(String id) {
@@ -56,7 +57,7 @@ public class ProductService {
     public Optional<ProductResponseDto> updateProduct(String id, UpdateProductDto dto) {
 	    return productRepository
 			    .findById(id)
-			    .map(product -> productMapper.updateEntity(product, dto))
+			    .map(product -> productMapper.updateModel(product, dto))
 			    .map(productMapper::toResponse);
     }
 
