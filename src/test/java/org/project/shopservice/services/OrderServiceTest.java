@@ -107,32 +107,32 @@ class OrderServiceTest {
 
 	@Test
 	void findOrderById() {
-		when(orderRepository.findById(anyInt()))
+		when(orderRepository.findById(anyLong()))
 				.thenReturn(Optional.of(order1));
-		assertNotNull(orderService.findOrderById(1));
-		verify(orderRepository, times(1)).findById(1);
+		assertNotNull(orderService.findOrderById(1L));
+		verify(orderRepository, times(1)).findById(1L);
 	}
 	@Test
 	void findOrderById_expectingNull() {
-		when(orderRepository.findById(eq(2)))
+		when(orderRepository.findById(eq(2L)))
 				.thenReturn(Optional.empty());
-		assertNull(orderService.findOrderById(2));
-		verify(orderRepository, times(1)).findById(2);
+		assertNull(orderService.findOrderById(2L));
+		verify(orderRepository, times(1)).findById(2L);
 	}
 
 	@Test
 	void testDeleteOrderById() {
-		when(orderRepository.findById(anyInt()))
+		when(orderRepository.findById(anyLong()))
 				.thenReturn(Optional.of(order1));
-		orderService.deleteOrderById(1);
-		Mockito.verify(orderRepository, times(1)).findById(anyInt());
+		orderService.deleteOrderById(1L);
+		Mockito.verify(orderRepository, times(1)).findById(anyLong());
 	}
 	@Test
 	void testDeleteOrderById_expectingIgnoreId() {
-		when(orderRepository.findById(eq(3)))
+		when(orderRepository.findById(eq(3L)))
 				.thenReturn(Optional.empty());
-		orderService.deleteOrderById(3);
-		Mockito.verify(orderRepository, times(1)).findById(anyInt());
+		orderService.deleteOrderById(3L);
+		Mockito.verify(orderRepository, times(1)).findById(anyLong());
 		Mockito.verifyNoMoreInteractions(orderRepository );
 	}
 	static Stream<Arguments> updateOrder() {
@@ -193,8 +193,8 @@ class OrderServiceTest {
 
 		when(orderRepository.save(any(OrderEntity.class)))
 				.thenReturn(order1);
-		assertDoesNotThrow(()->orderService.updateOrder(1,dto));
-		verify(orderRepository,times(1)).findById(any(Integer.class));
+		assertDoesNotThrow(()->orderService.updateOrder(1L,dto));
+		verify(orderRepository,times(1)).findById(any(Long.class));
 	}
 	@Test
 	void testUpdateOrder_twice(){
@@ -210,9 +210,9 @@ class OrderServiceTest {
 
 		when(orderRepository.save(any(OrderEntity.class)))
 				.thenReturn(order1);
-		orderService.updateOrder(1,dto);
-		orderService.updateOrder(1,dto);
-		verify(orderRepository,times(2)).findById(any(Integer.class));
+		orderService.updateOrder(1L,dto);
+		orderService.updateOrder(1L,dto);
+		verify(orderRepository,times(2)).findById(any(Long.class));
 	}
 	@Test
 	void testUpdateOrder_nullDto() {
@@ -221,13 +221,13 @@ class OrderServiceTest {
 				.thenReturn(Optional.of(order1));
 
 		assertTrue(dto.isEmpty());
-		assertDoesNotThrow(()->orderService.updateOrder(1,dto));
+		assertDoesNotThrow(()->orderService.updateOrder(1L,dto));
 		verifyNoMoreInteractions(orderRepository);
 	}
 
 	@Test
 	void testUpdateOrder_expectingNoSuchElementException(){
-		assertThrowsExactly(NoSuchElementException.class,()->orderService.updateOrder(3,null));
+		assertThrowsExactly(NoSuchElementException.class,()->orderService.updateOrder(3L,null));
 		verify(orderRepository,times(0)).save(any(OrderEntity.class));
 	}
 

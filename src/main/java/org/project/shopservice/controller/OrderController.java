@@ -27,15 +27,15 @@ public class OrderController {
         return ResponseEntity.ok(orderService.createOrder(dto));
     }
     @GetMapping("/{id}")
-    public ResponseEntity<OrderResponseDto> getOrder(@PathVariable Integer id) {
+    public ResponseEntity<OrderResponseDto> getOrder(@PathVariable Long id) {
         return ResponseEntity.ok(orderService.findOrderById(id));
     }
     @PatchMapping("/{id}")
-    public ResponseEntity<OrderResponseDto> updateOrder(@PathVariable Integer id, @Valid @RequestBody UpdateOrderDto dto) {
+    public ResponseEntity<OrderResponseDto> updateOrder(@PathVariable Long id, @Valid @RequestBody UpdateOrderDto dto) {
         return ResponseEntity.ok(orderService.updateOrder(id,dto));
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<OrderResponseDto> deleteOrder(@PathVariable Integer id) {
+    public ResponseEntity<OrderResponseDto> deleteOrder(@PathVariable Long id) {
         orderService.deleteOrderById(id);
         return ResponseEntity.noContent().build();
     }

@@ -51,28 +51,28 @@ public class OrderService {
 				order.assignOrder();
 				userService.fillFieldsEmailAndWhose(order);
 				OrderEntity save = orderRepository.save(order);
-				sendTemplate(order,"Order Created!", "order-notification");
+				sendTemplate(order,"Order Created!");
 				response = orderMapper.toDto(save);
 			}
         }
 		 return response;
     }
 
-    public OrderResponseDto findOrderById(Integer id) {
+    public OrderResponseDto findOrderById(Long id) {
         Optional<OrderEntity> order = orderRepository.findById(id);
         return order.isPresent() ? order.map(orderMapper::toDto).get() : null;
     }
 
-    public void deleteOrderById(Integer id) {
+    public void deleteOrderById(Long id) {
         Optional<OrderEntity> order = orderRepository.findById(id);
         if(order.isPresent()) {
             order.get().setStatus("DELETED");
-            sendTemplate(order.get(),"Order Deleted!", "order-notification");
+            sendTemplate(order.get(),"Order Deleted!");
             orderRepository.delete(order.get());
         }
     }
 
-    public OrderResponseDto updateOrder(Integer order_id, UpdateOrderDto dto) {
+    public OrderResponseDto updateOrder(Long order_id, UpdateOrderDto dto) {
         OrderEntity order = orderRepository.findById(order_id).orElseThrow();   // NoSuchElementException
 	    if(!dto.isEmpty()){
 		    deleteItems(order, dto);
@@ -82,7 +82,7 @@ public class OrderService {
 		    order.assignOrder();
 		    OrderEntity save = orderRepository.save(order);
 
-		    sendTemplate(save,"Order updated!", "order-notification");
+		    sendTemplate(save,"Order updated!");
 		    return orderMapper.toDto(save);
 	    }
         else return orderMapper.toDto(order);
@@ -94,12 +94,11 @@ public class OrderService {
 			if(!emptyToDdelete ) {
 				Set<String> idsToDelete = new HashSet<>(dto.onDelete());
 				Set<String> idsToUpdate =
-						!emptyToUpdate
-								? dto.updateItems()
+						!emptyToUpdate ? dto.updateItems()
 								.stream()
 								.map(UpdateOrderItemDto::productId)
 								.collect(Collectors.toSet())
-								: Collections.emptySet();
+						: Collections.emptySet();
 
 				boolean contains = !Collections.disjoint(idsToDelete, idsToUpdate);
 				if(!contains) {
@@ -123,17 +122,21 @@ public class OrderService {
             Map<String, ProductResponseDto> products = listOfFoundProducts.stream()
                     .map(productMapper::toResponse)
                     .collect(Collectors.toMap(ProductResponseDto::id, Function.identity()));
-            items.forEach(item -> item.setPrice(products.get(item.getProductId()).price()));
+            items.forEach(item -> {
+	            ProductResponseDto temp = products.get(item.getProductId());
+	            item.setPrice(temp.price());
+				item.setCategoryAndType(temp.category()+"; "+ temp.type());
+            });
             order.setItems(items);
         }
         return order;
     }
 
-    private void sendTemplate(OrderEntity order, String subject, String templateName) {
+    private void sendTemplate(OrderEntity order, String subject) {
         emailService.sendEmail(SendEmailDto.builder()
                 .to(order.getEmail())
                 .subject(subject)
-                .templateName(templateName)
+                .templateName("order-notification")
                 .contextData(Map.of(
                         "whose", order.getWhose(),
                         "email", order.getEmail(),

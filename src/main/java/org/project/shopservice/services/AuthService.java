@@ -39,9 +39,14 @@ public class AuthService implements UserDetailsService {
         throw new IllegalArgumentException("Invalid username or password");
     }
 
-    public TokensDto registrateUser( UserRegistrationDto dto) {
+    @SneakyThrows
+    public TokensDto registrateUser(UserRegistrationDto dto) {
+        if(dto == null) return null;
         User user = null;
         if(!dto.hasEmptyRequiredFields()){
+            if(userRepository.findByEmail(dto.email()).isPresent()){
+                throw new UserAlreadyExistException("User with email " + dto.email() + " already exists");
+            }
             String role = StringUtils.isBlank(dto.role()) ? "USER" : Roles.valueOf(dto.role().toUpperCase()).toString();
             user = User.builder()
                     .firstName(dto.firstName())
@@ -74,20 +79,15 @@ public class AuthService implements UserDetailsService {
     @SneakyThrows
     private TokensDto generator(User user){
         if(user != null){
-            if(userRepository.findByEmail(user.getEmail()).isPresent()){
-                throw new UserAlreadyExistException("User with email " + user.getEmail() + " already exists");
-            }
-            else{
-                String accessToken = jwtUtil.generateAccessToken(user);
-                String refreshToken = jwtUtil.generateRefreshToken(user);
-                user.setRefreshToken(refreshToken);
+            String accessToken = jwtUtil.generateAccessToken(user);
+            String refreshToken = jwtUtil.generateRefreshToken(user);
+            user.setRefreshToken(refreshToken);
 
-                userRepository.save(user);
-                return TokensDto.builder()
-                        .accessToken(accessToken)
-                        .refreshToken(refreshToken)
-                        .build();
-            }
+            userRepository.save(user);
+            return TokensDto.builder()
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
+                    .build();
         } else throw new IllegalArgumentException("Object has Empty fields!");
     }
 }

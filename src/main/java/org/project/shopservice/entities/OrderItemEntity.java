@@ -22,6 +22,8 @@ public class OrderItemEntity {
     @Column(name = "product_id")
     private String productId;
 
+    private String categoryAndType;
+
     private BigDecimal price;
 
     private Long amount;

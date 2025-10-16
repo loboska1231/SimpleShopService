@@ -1,6 +1,5 @@
 package org.project.shopservice.services;
 
-import io.micrometer.common.util.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,12 +8,9 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.project.shopservice.dtos.onRequest.users.UserAuthDto;
 import org.project.shopservice.dtos.onRequest.users.UserRegistrationDto;
-import org.project.shopservice.dtos.onResponse.TokensDto;
-import org.project.shopservice.enums.Roles;
 import org.project.shopservice.models.User;
 import org.project.shopservice.repository.UserRepository;
 import org.project.shopservice.security.utils.JwtUtil;
@@ -28,6 +24,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
@@ -56,6 +53,7 @@ class AuthServiceTest {
 				.password(passwordEncoder.encode("12345"))
 				.lastName("testing")
 				.roles(Set.of("USER"))
+				.refreshToken("refresh")
 				.build();
 	}
 
@@ -133,7 +131,6 @@ class AuthServiceTest {
 						.build())
 		);
 	}
-
 	@ParameterizedTest
 	@MethodSource("registrateUserDoesNotThrows")
 	public void testRegistateUser(UserRegistrationDto dto){
@@ -141,13 +138,13 @@ class AuthServiceTest {
 		assertDoesNotThrow(()-> authService.registrateUser(dto));
 		assertFalse(dto.hasEmptyRequiredFields());
 		verify(userRepository).save(any(User.class));
-		verifyNoMoreInteractions(userRepository);
+		verify(userRepository).findByEmail(anyString());
 	}
 	@Test
 	public void testAuthenticateUser(){
 		UserAuthDto userAuthDto = new UserAuthDto("test@testing.com","12345");
 		when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user));
-		when(passwordEncoder.matches(anyString(),anyString())).thenReturn(new BCryptPasswordEncoder().matches(userAuthDto.password(), user.getPassword()));
+		when(passwordEncoder.matches(anyString(),anyString())).thenReturn(Boolean.TRUE);
 
 		assertDoesNotThrow(()-> authService.authenticateUser(userAuthDto));
 		verify(userRepository).save(any(User.class));
@@ -186,15 +183,12 @@ class AuthServiceTest {
 
 	@Test
 	public void testRefreshToken(){
-		var dto = UserRegistrationDto
-				.builder()
-				.email("test@testing.com")
-				.password("12345")
-				.firstName("test")
-				.lastName("testing")
-				.build();
-		var tokens = authService.registrateUser(dto);
-
-		assertNull(tokens);
+		when(jwtUtil.extractUsername(anyString())).thenReturn("test@testing.com");
+		when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user));
+		when(jwtUtil.extractUsername(anyString())).thenReturn("test@testing.com");
+		assertDoesNotThrow(()-> authService.refreshToken(anyString()));
+		assertNotNull(authService.refreshToken("refresh"));
+		verify(userRepository).findByEmail(anyString());
+		verify(userRepository).save(any(User.class));
 	}
 }

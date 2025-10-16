@@ -128,3 +128,14 @@ databaseChangeLog:
             oldColumnName: username
             newColumnName: email
 
+  - changeSet:
+      id: "1.3.b"
+      author: "Borys"
+      changes:
+        - addColumn:
+            tableName: order_items
+            columns:
+              - column:
+                  name: categoryAndType
+                  type: varchar(255)
+
