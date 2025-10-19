@@ -27,9 +27,9 @@ public class User implements UserDetails {
 	private String refreshToken;
 	private Set<String> roles;
 
-	public Collection<? extends GrantedAuthority> getAuthorities(){
+	public Collection<? extends GrantedAuthority>   getAuthorities(){
 		if(!roles.isEmpty()){
-			return roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toSet());
+			return roles.stream().map(role-> new SimpleGrantedAuthority("ROLE_%s".formatted(role))).collect(Collectors.toSet());
 		} else return Collections.emptySet();
 	}
 

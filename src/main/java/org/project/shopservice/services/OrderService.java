@@ -76,8 +76,8 @@ public class OrderService {
         OrderEntity order = orderRepository.findById(order_id).orElseThrow();   // NoSuchElementException
 	    if(!dto.isEmpty()){
 		    deleteItems(order, dto);
-		    loadOrderItemsInfo(order);
 		    orderMapper.updateOrder(order, dto);
+		    loadOrderItemsInfo(order);
 		    order.setTotal();
 		    order.assignOrder();
 		    OrderEntity save = orderRepository.save(order);

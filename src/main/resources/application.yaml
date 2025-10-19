@@ -30,9 +30,9 @@ spring:
 jwt:
   secret-key: "a1a4942fc86f78620bc6f9a0fd7de653e0c08efa430f2c7ae7567c089a0087905bcfad2794cc3f6f"
   access-token:
-    ttl-millis: 60000
+    ttl-millis: 300000
   refresh-token:
-    ttl-millis: 900000
+    ttl-millis: 1800000
 
 server:
   port: 8080

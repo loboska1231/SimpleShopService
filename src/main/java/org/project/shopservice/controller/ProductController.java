@@ -1,5 +1,6 @@
 package org.project.shopservice.controller;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.project.shopservice.dtos.onRequest.products.CreateProductDto;
@@ -26,18 +27,21 @@ public class ProductController {
 			) { // permit all
         return ResponseEntity.ok(productService.findProducts(min,max,category));
     }
-    @PostMapping
-    public ResponseEntity<ProductResponseDto> createProduct(@Valid @RequestBody CreateProductDto dto){
-        return ResponseEntity.ok(productService.createProduct(dto));
-    }
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponseDto> getProduct(@PathVariable String id) { // permit all
         return ResponseEntity.ok(productService.findProductById(id).orElseThrow());
     }
+    @RolesAllowed("ADMIN")
+    @PostMapping
+    public ResponseEntity<ProductResponseDto> createProduct(@Valid @RequestBody CreateProductDto dto){
+        return ResponseEntity.ok(productService.createProduct(dto));
+    }
+    @RolesAllowed("ADMIN")
     @PatchMapping("/{id}")
     public ResponseEntity<ProductResponseDto> updateProduct(@PathVariable String id, @Valid @RequestBody UpdateProductDto dto) {
         return ResponseEntity.ok(productService.updateProduct(id, dto).orElseThrow());
     }
+    @RolesAllowed("ADMIN")
     @DeleteMapping("/{id}")
     public ResponseEntity<ProductResponseDto> deleteProduct(@PathVariable String id) {
         productService.deleteProductById(id);

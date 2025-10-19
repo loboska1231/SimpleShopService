@@ -40,7 +40,9 @@ public interface OrderMapper {
 	default OrderEntity updateOrder(@MappingTarget OrderEntity order, UpdateOrderDto dto) {
 		if (dto != null) {
 			order.setStatus("UPDATED");
-			order.setAddress(dto.address());
+			if(dto.address()!=null){
+				order.setAddress(dto.address());
+			}
 			List<UpdateOrderItemDto> dtoItems = dto.updateItems();
 			if (!CollectionUtils.isEmpty(dtoItems)) {
 				List<OrderItemEntity> items = order.getItems();

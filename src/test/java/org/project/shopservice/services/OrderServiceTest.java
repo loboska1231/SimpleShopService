@@ -70,9 +70,9 @@ class OrderServiceTest {
 				.status("CREATED")
 				.build();
 		orderItems1 = new ArrayList<>(List.of(
-				new OrderItemEntity(1L, "0001", new BigDecimal(500), 4L, order1),
-				new OrderItemEntity(2L, "0002", new BigDecimal(300), 6L, order1),
-				new OrderItemEntity(3L, "0003", new BigDecimal(100), 2L, order1)
+				new OrderItemEntity(1L, "0001","testType", new BigDecimal(500), 4L, order1),
+				new OrderItemEntity(2L, "0002","testType", new BigDecimal(300), 6L, order1),
+				new OrderItemEntity(3L, "0003","testType", new BigDecimal(100), 2L, order1)
 		));
 		order1.setItems(orderItems1);
 

@@ -1,5 +1,6 @@
 package org.project.shopservice.controller;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.project.shopservice.dtos.onRequest.orders.CreateOrderDto;
@@ -18,6 +19,7 @@ public class OrderController {
 
     private final OrderService orderService;
 
+    @RolesAllowed("ADMIN")
     @GetMapping
     public ResponseEntity<List<OrderResponseDto>> getOrders() {
         return ResponseEntity.ok(orderService.findOrders());

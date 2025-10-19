@@ -23,21 +23,21 @@ import org.springframework.security.web.access.intercept.AuthorizationFilter;
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
-@EnableMethodSecurity
+@EnableMethodSecurity(jsr250Enabled = true)
 public class SecurityConfig {
 	private final JwtUtil jwtUtil;
 	private final AuthService authService;
 	private final PasswordEncoder passwordEncoder;
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{ // ### 1 ###
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception { // ### 1 ###
 		return http
 				.csrf(CsrfConfigurer::disable)
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(request->
-						request.requestMatchers("/orders","/orders/**").authenticated()
-								.requestMatchers("/auth/**", "/error").permitAll()
-								.requestMatchers(HttpMethod.GET,"/products","/products/**").permitAll()
-								.anyRequest().authenticated()
+					request
+						.requestMatchers("/auth/**", "/error","/swagger-ui/**","/v3/api-docs/**").permitAll()
+						.requestMatchers(HttpMethod.GET,"/products","/products/**").permitAll()
+						.anyRequest().authenticated()
 				)
 				.authenticationProvider(authenticationProvider())
 				.addFilterBefore(jwtFilter(), AuthorizationFilter.class)
@@ -55,8 +55,7 @@ public class SecurityConfig {
 		return dao;
 	}
 	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
-			throws Exception {
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
 		return config.getAuthenticationManager();
 	}
 }
