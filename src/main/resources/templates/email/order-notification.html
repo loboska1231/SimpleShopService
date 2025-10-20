@@ -2,7 +2,7 @@
     <html xmlns:th="http://www.thymeleaf.org">
         <head>
             <meta charset="UTF-8">
-            <title>Order Deleted</title>
+            <title>Order Created</title>
             <style>
                 body {
                     margin: 2rem;
@@ -44,14 +44,22 @@
             </style>
         </head>
         <body>
-            <header>
-                <h1>Order Deleted</h1>
-                <p>Hi, <strong><span th:text="${whose}"></span></strong> you have deleted an Order! </p>
-                <p>In the future, our team, (me and me), are going to add items-info in this letter</p>
-                <p>see ya soon!</p>
+            <header th:switch="${status}">
+                <div th:case="CREATED">
+                    <h1>Order Created</h1>
+                    <p>Hi, <strong><span th:text="${whose}"></span></strong> you have created an Order! </p>
+                </div>
+                <div th:case="UPDATED">
+                    <h1>Order Updated</h1>
+                    <p>Hi, <strong><span th:text="${whose}"></span></strong> you have updated an Order! </p>
+                </div>
+                <div th:case="DELETED">
+                    <h1>Order Created</h1>
+                    <p>Hi, <strong><span th:text="${whose}"></span></strong> you have deleted an Order! </p>
+                </div>
             </header>
             <main>
-                <h2>Order Deleted</h2>
+                <h2>Order Details</h2>
 
                 <div class="order-info" >
                     <p><strong>Customer:</strong> <span th:text="${whose}"></span></p>
@@ -60,11 +68,34 @@
                     <p><strong>Total Price:</strong>
                         <span th:text="${totalPrice}"></span>
                     </p>
-                    <p><strong>Date:</strong> <span th:text="${date}"></span></p>
+                    <p><strong>Date:</strong> <span th:text="${#dates.format(date, 'dd-MM-yyyy HH:mm')}"></span></p>
                     <p><strong>Status:</strong>
                         <span th:class="'status ' + ${status}" th:text="${status}"></span>
                     </p>
                 </div>
+
+                <h2>Order Items Details</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product ID</th>
+                            <th>Category, type (name)</th>
+                            <th>Price</th>
+                            <th>Amount</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr th:each="item : ${items}">
+                            <td th:text="${item.productId}"></td>
+                            <td th:text="${item.categoryAndType}"></td>
+                            <td th:text="${item.price}"></td>
+                            <td th:text="${item.amount}"></td>
+                            <td th:text="${item.totalPrice}"></td>
+                        </tr>
+                    </tbody>
+                </table>
             </main>
 
         </body>
