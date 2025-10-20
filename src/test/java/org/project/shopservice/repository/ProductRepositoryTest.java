@@ -10,14 +10,13 @@ import org.project.shopservice.config.TestContainersConfig;
 import org.project.shopservice.models.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.mongodb.core.index.TextIndexed;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(classes = TestContainersConfig.class)
 class ProductRepositoryTest {
@@ -220,4 +219,20 @@ class ProductRepositoryTest {
 	void findAllByPriceGreaterThanEqualAndCategoryIsIgnoreCase_expectingEmpty(int  min, String category){
 		assertTrue(productRepository.findAllByPriceGreaterThanEqualAndCategoryIsIgnoreCase(new Decimal128(BigDecimal.valueOf(min)),category).isEmpty());
 	}
+
+	static Stream<Arguments> testForfindByCategoryIsIgnoreCase(){
+		return Stream.of(
+				Arguments.of("testing"),
+				Arguments.of("tesTING 1" ),
+				Arguments.of("TESTing 2" ),
+				Arguments.of("CaStInG")
+		);
+	}
+
+	@ParameterizedTest
+	@MethodSource("testForfindByCategoryIsIgnoreCase")
+	void findAllByCategory_ExpectingNotEmpty(String category){
+		assertFalse(productRepository.findAllByCategoryIgnoreCase(category).isEmpty());
+	}
+
 }

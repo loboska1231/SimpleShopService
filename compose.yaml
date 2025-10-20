@@ -1,20 +1,35 @@
 services:
-  orders-service:
+  psql-service:
     image: postgres:latest
-    container_name: orders-service
+    container_name: psql-service
     restart: always
     ports:
       - "5432:5432"
+    volumes:
+      - ./psqldb:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: orders_db
       POSTGRES_USER: psql
       POSTGRES_PASSWORD: psql
 
-  products-service:
+  mongo-service:
     image: mongo:latest
-    container_name: products-service
+    container_name: mongo-service
     restart: always
     ports:
       - "27017:27017"
+    volumes:
+      - ./mongodb:/data/db
     environment:
-      MONGO_INITDB_DATABASE: products_db
+      MONGO_INITDB_DATABASE: mongo_db
+
+  shop-service:
+    build:
+      context: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend:/App
+    restart: on-failure
+    command: >
+      sh -c "java -jar Shop.jar"

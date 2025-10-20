@@ -45,7 +45,10 @@ public class ProductService {
 			products = productRepository.findAllByPriceLessThanEqual(new Decimal128(min));
 		} else if (max != null) {
 			products = productRepository.findAllByPriceGreaterThanEqual(new Decimal128(max));
-		} else products = productRepository.findAll();
+		} else if (category != null) {
+			products = productRepository.findAllByCategoryIgnoreCase(category);
+		}
+		else products = productRepository.findAll();
 		return products.stream().map(productMapper::toResponse).toList();
 	}
 

@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @Builder
 public record UpdateProductDto(
         @Nullable @Min(value = 1) BigDecimal price,
-        @Nullable @Length(min=1) String category,
-        @Nullable @Length(min=1) String type
+        @Nullable @Length(min=1, max = 30) String category,
+        @Nullable @Length(min=1, max = 30) String type
 ) {
 }

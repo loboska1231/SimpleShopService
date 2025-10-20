@@ -1,21 +1,23 @@
 spring:
   application:
     name: ShopService
+  profiles:
+    active: prod
   datasource:
-    url: ${POSTGRES_URL}
-    username: ${SQL_USERNAME}
-    password: ${SQL_USERNAME}
+    url: jdbc:postgresql://localhost:5432/orders_db
+    username: psql
+    password: psql
   jpa:
     hibernate:
       ddl-auto: update
   data:
     mongodb:
-      uri: ${MONGODB_URI}
+      uri: mongodb://localhost:27017/mongo_db
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_USERNAME}
+    username: suskovboris@gmail.com
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -26,11 +28,11 @@ spring:
           starttls:
             enable: true
 jwt:
-  secret-key: ${JWT_SECRET}
+  secret-key: "a1a4942fc86f78620bc6f9a0fd7de653e0c08efa430f2c7ae7567c089a0087905bcfad2794cc3f6f"
   access-token:
-    ttl-millis: ${JWT_ACC_TTL}
+    ttl-millis: 300000
   refresh-token:
-    ttl-millis: ${JWT_REF_TTL}
+    ttl-millis: 1800000
 
 server:
   port: 8080

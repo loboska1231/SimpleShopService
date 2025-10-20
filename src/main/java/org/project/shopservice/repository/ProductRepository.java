@@ -30,4 +30,6 @@ public interface ProductRepository extends MongoRepository<Product,String> {
 
     @Query(value = "{ $and:[ { price: { $gte: ?0} }, { category: {$regex: '^?1$', $options: 'mi' } } ] }")
     List<Product> findAllByPriceGreaterThanEqualAndCategoryIsIgnoreCase(Decimal128 min, String category);
+
+    List<Product> findAllByCategoryIgnoreCase(String category);
 }
