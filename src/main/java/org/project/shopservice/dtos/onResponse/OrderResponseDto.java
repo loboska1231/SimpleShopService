@@ -5,7 +5,7 @@ import lombok.Builder;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
-@Builder
+@Builder(toBuilder = true)
 public record OrderResponseDto (
 		Long id,
         String whose,

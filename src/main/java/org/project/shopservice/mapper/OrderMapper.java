@@ -39,8 +39,8 @@ public interface OrderMapper {
 
 	default OrderEntity updateOrder(@MappingTarget OrderEntity order, UpdateOrderDto dto) {
 		if (dto != null) {
-			order.setStatus("UPDATED");
 			if(dto.address()!=null){
+				order.setStatus("UPDATED");
 				order.setAddress(dto.address());
 			}
 			List<UpdateOrderItemDto> dtoItems = dto.updateItems();
@@ -61,6 +61,7 @@ public interface OrderMapper {
 						// adding item in itemsMap to avoid copies in items
 					}
 				});
+				order.setStatus("UPDATED");
 			}
 		}
 		return order;

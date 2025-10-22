@@ -28,97 +28,75 @@ public class ExceptionAdviser {
 	// *
 
 	@ExceptionHandler(NullPointerException.class)
-	public ResponseEntity<ErrorDto>handleNullPointerException(NullPointerException e){
-		Map<String, Object> details = new HashMap<>();
-		details.put("message", e.getMessage());
-
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(
+	public ResponseEntity<ErrorDto> handleNullPointerException(NullPointerException e) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.body(
 						ErrorDto.builder()
-							.date(Instant.now())
-							.exceptionType("NullPointerException")
-							.details(details)
-						.build()
-					);
+								.date(Instant.now())
+								.exceptionType("NullPointerException")
+								.details(e.getMessage())
+								.build()
+				);
 	}
 
 	@ExceptionHandler(UserAlreadyExistException.class)
-	public ResponseEntity<ErrorDto>handleUserAlreadyExistException(UserAlreadyExistException e){
-		Map<String, Object> details = new HashMap<>();
-		details.put("message", e.getMessage());
-
+	public ResponseEntity<ErrorDto> handleUserAlreadyExistException(UserAlreadyExistException e) {
 		return ResponseEntity.status(HttpStatus.CONFLICT)
 				.body(
 						ErrorDto.builder()
 								.date(Instant.now())
 								.exceptionType("UserAlreadyExistException")
-								.details(details)
+								.details(e.getMessage())
 								.build()
 				);
 	}
 
 	@ExceptionHandler(IllegalArgumentException.class)
-	public ResponseEntity<ErrorDto>handleIllegalArgumentException(IllegalArgumentException e){
-		Map<String, Object> details = new HashMap<>();
-		details.put("message", e.getMessage());
-
+	public ResponseEntity<ErrorDto> handleIllegalArgumentException(IllegalArgumentException e) {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 				.body(
 						ErrorDto.builder()
 								.date(Instant.now())
 								.exceptionType("IllegalArgumentException")
-								.details(details)
+								.details(e.getMessage())
 								.build()
 				);
 	}
 
 	@ExceptionHandler(NoSuchElementException.class)
-	public ResponseEntity<ErrorDto>handleNoSuchElementException(NoSuchElementException e){
-		Map<String, Object> details = getDetails(e);
+	public ResponseEntity<ErrorDto> handleNoSuchElementException(NoSuchElementException e) {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND)
 				.body(
 						ErrorDto.builder()
 								.date(Instant.now())
 								.exceptionType("NoSuchElementException")
-								.details(details)
+								.details(e.getMessage())
 								.build()
 				);
 	}
 
 	@ExceptionHandler(UsernameNotFoundException.class)
-	public ResponseEntity<ErrorDto>handleUsernameNotFoundException(UsernameNotFoundException e){
-		Map<String, Object> details =getDetails(e);
+	public ResponseEntity<ErrorDto> handleUsernameNotFoundException(UsernameNotFoundException e) {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND)
 				.body(
 						ErrorDto.builder()
 								.date(Instant.now())
 								.exceptionType("UserNotFoundException")
-								.details(details)
+								.details(e.getMessage())
 								.build()
 				);
 	}
 
 	@ExceptionHandler(JwtException.class)
-	public ResponseEntity<ErrorDto>handleJwtException(JwtException e){
-		Map<String, Object> details = new HashMap<>(Map.of("message", e.getMessage()));
+	public ResponseEntity<ErrorDto> handleJwtException(JwtException e) {
 
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 				.body(
 						ErrorDto.builder()
 								.date(Instant.now())
 								.exceptionType("JwtException")
-								.details(details)
+								.details(e.getMessage())
 								.build()
 				);
-	}
-
-	private Map<String, Object> getDetails(Exception e) {
-		Map<String, Object> details = new HashMap<>();
-		Arrays.stream(e.getSuppressed()).forEach(suppressed -> {
-			String field = suppressed.getClass().getSimpleName();
-			String message = suppressed.getMessage();
-			details.put(field, message);
-		});
-		return details;
 	}
 }

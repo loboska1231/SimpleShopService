@@ -9,6 +9,6 @@ import java.util.Map;
 public record ErrorDto(
 		String exceptionType,
 		Instant date,
-		Map<String,Object> details
+		String details
 ) {
 }

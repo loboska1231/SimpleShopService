@@ -65,7 +65,7 @@ public class AuthService implements UserDetailsService {
             String username = jwtUtil.extractUsername(refreshToken);
             User user = userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
             if(user.getRefreshToken().equals(refreshToken)) return generator(user);
-            else throw new JwtException("Wrong token");
+            else throw new JwtException("Wrong token, authenticate again");
         }
         return null;
     }
@@ -88,6 +88,6 @@ public class AuthService implements UserDetailsService {
                     .accessToken(accessToken)
                     .refreshToken(refreshToken)
                     .build();
-        } else throw new IllegalArgumentException("Object has Empty fields!");
+        } else throw new IllegalArgumentException("Has Empty fields!");
     }
 }

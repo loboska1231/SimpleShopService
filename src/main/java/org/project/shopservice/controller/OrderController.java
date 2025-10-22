@@ -8,6 +8,7 @@ import org.project.shopservice.dtos.onRequest.orders.UpdateOrderDto;
 import org.project.shopservice.dtos.onResponse.OrderResponseDto;
 import org.project.shopservice.services.OrderService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,7 +26,7 @@ public class OrderController {
         return ResponseEntity.ok(orderService.findOrders());
     }
     @PostMapping
-    public ResponseEntity<OrderResponseDto> createOrder(@Valid @RequestBody CreateOrderDto dto) {
+    public ResponseEntity<OrderResponseDto> createOrder(@Validated @RequestBody CreateOrderDto dto) {
         return ResponseEntity.ok(orderService.createOrder(dto));
     }
     @GetMapping("/{id}")
@@ -33,7 +34,7 @@ public class OrderController {
         return ResponseEntity.ok(orderService.findOrderById(id));
     }
     @PatchMapping("/{id}")
-    public ResponseEntity<OrderResponseDto> updateOrder(@PathVariable Long id, @Valid @RequestBody UpdateOrderDto dto) {
+    public ResponseEntity<OrderResponseDto> updateOrder(@PathVariable Long id, @Validated @RequestBody UpdateOrderDto dto) {
         return ResponseEntity.ok(orderService.updateOrder(id,dto));
     }
     @DeleteMapping("/{id}")

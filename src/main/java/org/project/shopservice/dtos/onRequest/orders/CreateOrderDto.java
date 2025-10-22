@@ -1,7 +1,9 @@
 package org.project.shopservice.dtos.onRequest.orders;
 
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.NonNull;
@@ -16,7 +18,7 @@ import java.util.List;
 @Builder
 public record CreateOrderDto(
         @NonNull @NotBlank @Length(min = 1, max = 30) String address,
-        @NonNull @Size(min = 1) List<CreateOrderItemDto> items
+        @Valid @NonNull @NotEmpty @Size(min = 1) List<CreateOrderItemDto> items
 ) {
 	public boolean hasEmptyFields() {
 		return StringUtils.isBlank(address) || CollectionUtils.isEmpty(items);

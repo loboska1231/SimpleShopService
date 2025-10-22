@@ -23,7 +23,7 @@ public class UserService {
 			User user = userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 			return user.getFirstName()+" "+user.getLastName();
 		}
-		throw new JwtException("username is empty");
+		throw new JwtException("Username is empty");
 	}
 	private String extractUsername(){
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -32,7 +32,7 @@ public class UserService {
 				return username;
 			else throw new UsernameNotFoundException("User not found");
 		}
-		throw new JwtException("username is empty");
+		throw new JwtException("Username is empty");
 	}
 
 	public OrderEntity fillFieldsEmailAndWhose(OrderEntity order){
@@ -41,5 +41,10 @@ public class UserService {
 		order.setEmail(email);
 		order.setWhose(whose);
 		return order;
+	}
+
+	public boolean canAccess(String email){
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		return username.equals(email);
 	}
 }

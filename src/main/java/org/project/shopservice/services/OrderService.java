@@ -39,9 +39,15 @@ public class OrderService {
     public List<OrderResponseDto> findOrders() {
         return orderRepository.findAll().stream().map(orderMapper::toDto).toList();
     }
-
-    public OrderResponseDto createOrder(CreateOrderDto dto) {
-		OrderResponseDto response = null;
+/*
+* if(userService.isOwner(order.getEmail())){
+*   ...
+* } throw new NotAllowedException("You are not allowed to access to this ... ")
+*
+*
+*
+ */
+	public OrderResponseDto createOrder(CreateOrderDto dto) {
         if(!dto.hasEmptyFields()){
 	        CreateOrderDto tidiedDto = dto.tidyOrNull();
 			if(tidiedDto!=null){
@@ -52,11 +58,11 @@ public class OrderService {
 				userService.fillFieldsEmailAndWhose(order);
 				OrderEntity save = orderRepository.save(order);
 				sendTemplate(order,"Order Created!");
-				response = orderMapper.toDto(save);
+				return orderMapper.toDto(save);
 			}
         }
-		 return response;
-    }
+		return null;
+	}
 
     public OrderResponseDto findOrderById(Long id) {
         Optional<OrderEntity> order = orderRepository.findById(id);
