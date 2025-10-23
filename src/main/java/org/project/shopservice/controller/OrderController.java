@@ -12,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,11 +32,11 @@ public class OrderController {
     }
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponseDto> getOrder(@PathVariable Long id) {
-        return ResponseEntity.ok(orderService.findOrderById(id));
+        return ResponseEntity.ok(orderService.findOrderById(id).orElseThrow(()-> new NoSuchElementException("Order not found")));
     }
     @PatchMapping("/{id}")
     public ResponseEntity<OrderResponseDto> updateOrder(@PathVariable Long id, @Validated @RequestBody UpdateOrderDto dto) {
-        return ResponseEntity.ok(orderService.updateOrder(id,dto));
+        return ResponseEntity.ok(orderService.updateOrder(id,dto).orElseThrow((()->new NoSuchElementException("Order not found"))));
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<OrderResponseDto> deleteOrder(@PathVariable Long id) {

@@ -25,7 +25,7 @@ class ExceptionAdviserUnitTest {
 		assertEquals(400,response.getStatusCode().value()); // 400
 		assertNotNull(response.getBody());
 		assertEquals("NullPointerException",response.getBody().exceptionType());
-		assertEquals("null value",response.getBody().details());
+		assertEquals("null value",response.getBody().details().get("message"));
 	}
 
 	@Test
@@ -35,7 +35,7 @@ class ExceptionAdviserUnitTest {
 		assertTrue(response.getStatusCode().is4xxClientError());
 		assertEquals(409,response.getStatusCode().value()); // 409
 		assertNotNull(response.getBody());
-		assertEquals("users already exists",response.getBody().details());
+		assertEquals("users already exists",response.getBody().details().get("message"));
 	}
 
 	@Test
@@ -46,7 +46,7 @@ class ExceptionAdviserUnitTest {
 		assertEquals(404,response.getStatusCode().value()); // 404
 		assertNotNull(response.getBody());
 		assertEquals("UserNotFoundException",response.getBody().exceptionType());
-		assertEquals("not found",response.getBody().details());
+		assertEquals("not found",response.getBody().details().get("message"));
 	}
 
 	@Test
@@ -57,7 +57,7 @@ class ExceptionAdviserUnitTest {
 		assertEquals(400,response.getStatusCode().value()); // 400
 		assertNotNull(response.getBody());
 		assertEquals("IllegalArgumentException",response.getBody().exceptionType());
-		assertEquals("illegal argument",response.getBody().details());
+		assertEquals("illegal argument",response.getBody().details().get("message"));
 	}
 	@Test
 	public void testHandleJwtException(){
@@ -67,7 +67,7 @@ class ExceptionAdviserUnitTest {
 		assertEquals(500,response.getStatusCode().value()); // 500
 		assertNotNull(response.getBody());
 		assertEquals("JwtException",response.getBody().exceptionType());
-		assertEquals("jwt",response.getBody().details());
+		assertEquals("jwt",response.getBody().details().get("message"));
 	}
 	@Test
 	public void testHandleNoSuchElementException(){
@@ -77,6 +77,6 @@ class ExceptionAdviserUnitTest {
 		assertEquals(404,response.getStatusCode().value()); // 404
 		assertNotNull(response.getBody());
 		assertEquals("NoSuchElementException",response.getBody().exceptionType());
-		assertEquals("no ele",response.getBody().details());
+		assertEquals("no ele",response.getBody().details().get("message"));
 	}
 }

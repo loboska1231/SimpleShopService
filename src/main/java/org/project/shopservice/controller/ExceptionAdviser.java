@@ -6,11 +6,12 @@ import org.project.shopservice.exceptions.UserAlreadyExistException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -25,7 +26,26 @@ public class ExceptionAdviser {
 	// UsernameNotFoundException
 	// JwtException
 	// UserAlreadyExistException
+	// MethodArgumentNotValidException
 	// *
+
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public ResponseEntity<ErrorDto> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+		HashMap<String, String> errors = new HashMap<>();
+
+		e.getBindingResult().getAllErrors().forEach(error -> {
+			String field = ((FieldError) error).getField();
+			String message = error.getDefaultMessage();
+			errors.put(field, message);
+		});
+		ErrorDto dto = ErrorDto.builder()
+				.date(Instant.now())
+				.exceptionType("MethodArgumentNotValidException")
+				.details(errors)
+				.build();
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.body(dto);
+	}
 
 	@ExceptionHandler(NullPointerException.class)
 	public ResponseEntity<ErrorDto> handleNullPointerException(NullPointerException e) {
@@ -34,7 +54,7 @@ public class ExceptionAdviser {
 						ErrorDto.builder()
 								.date(Instant.now())
 								.exceptionType("NullPointerException")
-								.details(e.getMessage())
+								.details(Map.of("message", e.getMessage()))
 								.build()
 				);
 	}
@@ -46,7 +66,7 @@ public class ExceptionAdviser {
 						ErrorDto.builder()
 								.date(Instant.now())
 								.exceptionType("UserAlreadyExistException")
-								.details(e.getMessage())
+								.details(Map.of("message", e.getMessage()))
 								.build()
 				);
 	}
@@ -58,7 +78,7 @@ public class ExceptionAdviser {
 						ErrorDto.builder()
 								.date(Instant.now())
 								.exceptionType("IllegalArgumentException")
-								.details(e.getMessage())
+								.details(Map.of("message", e.getMessage()))
 								.build()
 				);
 	}
@@ -70,7 +90,7 @@ public class ExceptionAdviser {
 						ErrorDto.builder()
 								.date(Instant.now())
 								.exceptionType("NoSuchElementException")
-								.details(e.getMessage())
+								.details(Map.of("message", e.getMessage()))
 								.build()
 				);
 	}
@@ -82,7 +102,7 @@ public class ExceptionAdviser {
 						ErrorDto.builder()
 								.date(Instant.now())
 								.exceptionType("UserNotFoundException")
-								.details(e.getMessage())
+								.details(Map.of("message", e.getMessage()))
 								.build()
 				);
 	}
@@ -95,7 +115,7 @@ public class ExceptionAdviser {
 						ErrorDto.builder()
 								.date(Instant.now())
 								.exceptionType("JwtException")
-								.details(e.getMessage())
+								.details(Map.of("message", e.getMessage()))
 								.build()
 				);
 	}

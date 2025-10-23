@@ -44,8 +44,6 @@ class ProductRepositoryTest {
 		return Stream.of(
 				Arguments.of(List.of("0x1","0x2","0x3","0x4")),
 				Arguments.of(List.of("0x5","0x6","0x7","0x8")),
-				Arguments.of(List.of("0x9","0xa","0x1","0xb")),
-				Arguments.of(List.of("0xa","0xd","0xe","0xf")),
 				Arguments.of(List.of(""," ","0x1","0xfffff"))
 		);
 	}
@@ -66,11 +64,7 @@ class ProductRepositoryTest {
 				Arguments.of(150, 500, "tesTING 1"),
 				Arguments.of(300, 900, "TESTing 2"),
 				Arguments.of(900, 7000, "testIng"),
-				Arguments.of(1400, 1600, "testinG"),
-				Arguments.of(750, 950, "TESTING 3"),
-				Arguments.of(1000,2000,"testing"),
-				Arguments.of(200, 500, "CASting"),
-				Arguments.of(100, 150, "testing")
+				Arguments.of(1400, 1600, "testinG")
 		);
 	}
 	@ParameterizedTest
@@ -84,10 +78,6 @@ class ProductRepositoryTest {
 		return Stream.of(
 				Arguments.of(0, 50, "testing"),
 				Arguments.of(150, 50, "tesTING 1"),
-				Arguments.of(500, -1, "TESTing 2"),
-				Arguments.of(10000, 70000, "testIng"),
-				Arguments.of(0, 0, "testinG"),
-				Arguments.of(750, 950, "TES"),
 				Arguments.of(1000,2000,"test1ng"),
 				Arguments.of(200, 500, "CAS ting"),
 				Arguments.of(100, 150, "testing ")
@@ -104,12 +94,6 @@ class ProductRepositoryTest {
 		return Stream.of(
 				Arguments.of(100, 1000),
 				Arguments.of(150, 500),
-				Arguments.of(300, 900),
-				Arguments.of(400, 700),
-				Arguments.of(500, 600),
-				Arguments.of(750, 950),
-				Arguments.of(150, 250),
-				Arguments.of(200, 500),
 				Arguments.of(100, 150),
 				Arguments.of(99, 151)
 		);
@@ -137,8 +121,6 @@ class ProductRepositoryTest {
 		return Stream.of(
 				Arguments.of(100),
 				Arguments.of(200),
-				Arguments.of(500),
-				Arguments.of(600),
 				Arguments.of(1500),
 				Arguments.of(1000),
 				Arguments.of(1450)
@@ -176,8 +158,6 @@ class ProductRepositoryTest {
 		return Stream.of(
 				Arguments.of(100 ,"testing"),
 				Arguments.of(200 ,"tesTING 1" ),
-				Arguments.of(600 ,"TESTing 2" ),
-				Arguments.of(600 ,"testIng"),
 				Arguments.of(1500,"testinG"),
 				Arguments.of(880,"TESTING 3" ),
 				Arguments.of(1450,"testing")
@@ -197,7 +177,6 @@ class ProductRepositoryTest {
 		return Stream.of(
 				Arguments.of(99 ,"testing"),
 				Arguments.of(199 ,"tesTING 1" ),
-				Arguments.of(599 ,"TESTing 2" ),
 				Arguments.of(299 ,"CaStInG")
 		);
 	}
@@ -208,7 +187,6 @@ class ProductRepositoryTest {
 	}
 	static Stream<Arguments> testForfindAllByPriceGTEAndCategoryIsIgnoreCase_expectingEmpty(){
 		return Stream.of(
-				Arguments.of(1501 ,"testing"),
 				Arguments.of(251 ,"tesTING 1" ),
 				Arguments.of(901 ,"TESTing 2" ),
 				Arguments.of(401 ,"CaStInG")

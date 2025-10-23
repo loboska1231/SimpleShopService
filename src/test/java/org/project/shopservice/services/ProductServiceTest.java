@@ -201,7 +201,6 @@ class ProductServiceTest {
 		Assertions.assertFalse(dto.isEmpty());
 
 		Mockito.verify(productRepository).findById("0001");
-//		Mockito.verify(productRepository).save(Mockito.any(Product.class));
 	}
 
 	@Test

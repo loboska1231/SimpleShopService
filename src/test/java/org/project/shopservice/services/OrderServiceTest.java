@@ -114,9 +114,7 @@ class OrderServiceTest {
 	}
 	@Test
 	void findOrderById_expectingNull() {
-		when(orderRepository.findById(eq(2L)))
-				.thenReturn(Optional.empty());
-		assertNull(orderService.findOrderById(2L));
+		assertTrue(orderService.findOrderById(2L).isEmpty());
 		verify(orderRepository, times(1)).findById(2L);
 	}
 
@@ -227,8 +225,9 @@ class OrderServiceTest {
 
 	@Test
 	void testUpdateOrder_expectingNoSuchElementException(){
-		assertThrowsExactly(NoSuchElementException.class,()->orderService.updateOrder(3L,null));
+		assertDoesNotThrow(()->orderService.updateOrder(3L,null));
 		verify(orderRepository,times(0)).save(any(OrderEntity.class));
+		assertTrue(orderService.updateOrder(3L,null).isEmpty());
 	}
 
 	@Test

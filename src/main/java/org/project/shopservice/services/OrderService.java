@@ -64,9 +64,8 @@ public class OrderService {
 		return null;
 	}
 
-    public OrderResponseDto findOrderById(Long id) {
-        Optional<OrderEntity> order = orderRepository.findById(id);
-        return order.isPresent() ? order.map(orderMapper::toDto).get() : null;
+    public Optional<OrderResponseDto> findOrderById(Long id) {
+        return orderRepository.findById(id).map(orderMapper::toDto);
     }
 
     public void deleteOrderById(Long id) {
@@ -78,29 +77,32 @@ public class OrderService {
         }
     }
 
-    public OrderResponseDto updateOrder(Long order_id, UpdateOrderDto dto) {
-        OrderEntity order = orderRepository.findById(order_id).orElseThrow();   // NoSuchElementException
-	    if(!dto.isEmpty()){
-		    deleteItems(order, dto);
-		    orderMapper.updateOrder(order, dto);
-		    loadOrderItemsInfo(order);
-		    order.setTotal();
-		    order.assignOrder();
-		    OrderEntity save = orderRepository.save(order);
+    public Optional<OrderResponseDto> updateOrder(Long order_id, UpdateOrderDto dto) {
+        Optional<OrderEntity> order = orderRepository.findById(order_id);
+	    if(order.isPresent() && !dto.isEmpty()){
+		    OrderEntity  entity = order.get();
+		    deleteItems(entity, dto);
+		    orderMapper.updateOrder(entity, dto);
+		    loadOrderItemsInfo(entity);
+		    entity.setTotal();
+		    entity.assignOrder();
+		    OrderEntity save = orderRepository.save(entity);
 
 		    sendTemplate(save,"Order updated!");
-		    return orderMapper.toDto(save);
+		    return Optional.of(  orderMapper.toDto(save));
 	    }
-        else return orderMapper.toDto(order);
+        else return order.map(orderMapper::toDto);
     }
 	private OrderEntity deleteItems(OrderEntity order, UpdateOrderDto dto){
 		if(!CollectionUtils.isEmpty(order.getItems())){
-			boolean emptyToDdelete = CollectionUtils.isEmpty(dto.onDelete());
-			boolean emptyToUpdate = CollectionUtils.isEmpty(dto.updateItems());
+			List<String> onDel = dto.onDelete();
+			List<UpdateOrderItemDto> onUpd = dto.updateItems();
+			boolean emptyToDdelete = CollectionUtils.isEmpty(onDel);
+			boolean emptyToUpdate = CollectionUtils.isEmpty(onUpd);
 			if(!emptyToDdelete ) {
-				Set<String> idsToDelete = new HashSet<>(dto.onDelete());
+				Set<String> idsToDelete = new HashSet<>(onDel);
 				Set<String> idsToUpdate =
-						!emptyToUpdate ? dto.updateItems()
+						!emptyToUpdate ? onUpd
 								.stream()
 								.map(UpdateOrderItemDto::productId)
 								.collect(Collectors.toSet())
@@ -123,7 +125,7 @@ public class OrderService {
             Set<String> ids = items.stream().map(OrderItemEntity::getProductId).collect(Collectors.toSet());
             List<Product> listOfFoundProducts = productRepository.findAllByIdIn(ids);
             if(listOfFoundProducts.isEmpty()){
-                throw new IllegalArgumentException("No products with these ids : " + ids);
+                throw new IllegalArgumentException("No products found with these ids : " + ids);
             }
             Map<String, ProductResponseDto> products = listOfFoundProducts.stream()
                     .map(productMapper::toResponse)

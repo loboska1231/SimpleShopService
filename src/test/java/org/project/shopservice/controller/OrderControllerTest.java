@@ -31,8 +31,10 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -181,7 +183,7 @@ class OrderControllerTest {
 	@SneakyThrows
 	void testGetOrder_200ExpectingIsOk_NotNullBody() {
 		when(orderService.findOrderById(eq(1L)))
-				.thenReturn(dto);
+				.thenReturn(Optional.of(dto));
 		mockMvc.perform(get("/orders/{id}", 1))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$").exists())
@@ -198,13 +200,13 @@ class OrderControllerTest {
 	@Test
 	@SneakyThrows
 	void testGetOrder_200ExpectingIsOk_NullBody() {
-		when(orderService.findOrderById(eq(1L)))
-				.thenReturn(dto);
+		when(orderService.findOrderById(eq(2L)))
+				.thenReturn(Optional.of(dto));
 		mockMvc.perform(get("/orders/{id}", 2))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$").doesNotExist());
+				.andExpect(jsonPath("$").exists());
 		verify(orderService).findOrderById(eq(2L));
-		assertNull(orderService.findOrderById(2L));
+		assertNotNull(orderService.findOrderById(2L));
 	}
 
 	@Test
@@ -214,7 +216,7 @@ class OrderControllerTest {
 				.address("test new")
 				.build();
 		when(orderService.updateOrder(eq(1L), any(UpdateOrderDto.class)))
-				.thenReturn(dto.toBuilder().status("UPDATED").address(updateOrderDto.address()).build());
+				.thenReturn(Optional.of(dto.toBuilder().status("UPDATED").address(updateOrderDto.address()).build()));
 		mockMvc.perform(patch("/orders/{id}", 1)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("""
@@ -239,7 +241,7 @@ class OrderControllerTest {
 	@SneakyThrows
 	void testUpdateOrder_200ExpectingIsOk_NothingChanged() {
 		when(orderService.updateOrder(eq(1L), any(UpdateOrderDto.class)))
-				.thenReturn(dto);
+				.thenReturn(Optional.of(dto));
 		mockMvc.perform(patch("/orders/{id}", 1)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("""
@@ -266,8 +268,6 @@ class OrderControllerTest {
 	@Test
 	@SneakyThrows
 	void testUpdateOrder_ExpectingNoSuchElementException(){
-		when(orderService.updateOrder(eq(2L), any(UpdateOrderDto.class)))
-				.thenThrow(NoSuchElementException.class);
 		mockMvc.perform(patch("/orders/{id}", 2)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("""
@@ -278,7 +278,7 @@ class OrderControllerTest {
 								}
 								"""))
 				.andExpect(status().isNotFound());
-	verify(orderService).updateOrder(eq(2L), any(UpdateOrderDto.class));
+	verify(orderService).updateOrder(any(Long.class),any(UpdateOrderDto.class));
 	}
 
 	@Test

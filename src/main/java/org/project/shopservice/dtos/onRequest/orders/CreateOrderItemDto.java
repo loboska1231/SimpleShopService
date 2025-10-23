@@ -8,7 +8,10 @@ import org.hibernate.validator.constraints.Length;
 
 @Builder
 public record CreateOrderItemDto(
-        @NotNull @NotBlank @Length(min = 1) String productId,
-        @NotNull @Min(value = 1L) Long amount
+		@NotBlank(message = "Product Id is empty!")
+		@Length(min = 1) String productId,
+
+        @NotNull(message = "Amount is empty!") @Min(value = 1L, message = "amount should be greater than 1!")
+        Long amount
 ){
 }

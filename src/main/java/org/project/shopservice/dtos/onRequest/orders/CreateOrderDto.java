@@ -17,8 +17,10 @@ import java.util.List;
 
 @Builder
 public record CreateOrderDto(
-        @NonNull @NotBlank @Length(min = 1, max = 30) String address,
-        @Valid @NonNull @NotEmpty @Size(min = 1) List<CreateOrderItemDto> items
+		@NotBlank(message = "Address is empty!")
+		@Length(min = 1, max = 30) String address,
+        @Valid @NotEmpty(message = "Items are empty!")
+        @Size(min = 1) List<CreateOrderItemDto> items
 ) {
 	public boolean hasEmptyFields() {
 		return StringUtils.isBlank(address) || CollectionUtils.isEmpty(items);

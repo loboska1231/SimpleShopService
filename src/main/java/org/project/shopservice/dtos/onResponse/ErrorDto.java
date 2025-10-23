@@ -3,12 +3,13 @@ package org.project.shopservice.dtos.onResponse;
 import lombok.Builder;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.Map;
 
 @Builder
 public record ErrorDto(
 		String exceptionType,
 		Instant date,
-		String details
+		Map<String,String> details
 ) {
 }

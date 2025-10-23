@@ -2,21 +2,13 @@ package org.project.shopservice.mapper;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
-import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.project.shopservice.dtos.onRequest.products.CreateProductDto;
 import org.project.shopservice.dtos.onRequest.products.UpdateProductDto;
 import org.project.shopservice.dtos.onResponse.ProductResponseDto;
 import org.project.shopservice.models.Product;
 
 import java.math.BigDecimal;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -54,8 +46,10 @@ class ProductMapperTest {
 		assertNull(productMapper.toEntity(null));
 	}
 	@Test
-	void testToEntity_expectingNullPointerException() {
-		assertThrowsExactly(NullPointerException.class,()->productMapper.toEntity(CreateProductDto.builder().build()));
+	void testToEntity_DoesNotThrowException_EmptyDto() {
+		assertDoesNotThrow(()->productMapper.toEntity(CreateProductDto.builder().build()));
+		// @NonNull from lombok
+		// @NotBlank is replacing @NotNull, both works on the controller layer, both from jakarta.validation
 	}
 
 	@Test

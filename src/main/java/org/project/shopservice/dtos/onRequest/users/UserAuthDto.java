@@ -8,8 +8,10 @@ import org.hibernate.validator.constraints.Length;
 
 @Builder
 public record UserAuthDto(
-        @NonNull @NotBlank String email,
-        @NonNull @NotBlank @Length(min = 4) String password
+        @NotBlank(message = "Email is empty!")
+        String email,
+        @NotBlank(message = "Password is empty!")
+        @Length(min = 4) String password
 ){
 	public boolean isValid() {
 		return StringUtils.isNotBlank(email) && (StringUtils.isNotBlank(password) && password.length() >= 4);

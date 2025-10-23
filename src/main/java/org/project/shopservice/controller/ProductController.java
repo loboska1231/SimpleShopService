@@ -8,10 +8,12 @@ import org.project.shopservice.dtos.onRequest.products.UpdateProductDto;
 import org.project.shopservice.dtos.onResponse.ProductResponseDto;
 import org.project.shopservice.services.ProductService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,17 +31,17 @@ public class ProductController {
     }
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponseDto> getProduct(@PathVariable String id) { // permit all
-        return ResponseEntity.ok(productService.findProductById(id).orElseThrow());
+        return ResponseEntity.ok(productService.findProductById(id).orElseThrow(()-> new NoSuchElementException("Product not found")));
     }
     @RolesAllowed("ADMIN")
     @PostMapping
-    public ResponseEntity<ProductResponseDto> createProduct(@Valid @RequestBody CreateProductDto dto){
+    public ResponseEntity<ProductResponseDto> createProduct(@Validated @RequestBody CreateProductDto dto){
         return ResponseEntity.ok(productService.createProduct(dto));
     }
     @RolesAllowed("ADMIN")
     @PatchMapping("/{id}")
-    public ResponseEntity<ProductResponseDto> updateProduct(@PathVariable String id, @Valid @RequestBody UpdateProductDto dto) {
-        return ResponseEntity.ok(productService.updateProduct(id, dto).orElseThrow());
+    public ResponseEntity<ProductResponseDto> updateProduct(@PathVariable String id, @Validated @RequestBody UpdateProductDto dto) {
+        return ResponseEntity.ok(productService.updateProduct(id, dto).orElseThrow(()-> new NoSuchElementException("Product not found")));
     }
     @RolesAllowed("ADMIN")
     @DeleteMapping("/{id}")
