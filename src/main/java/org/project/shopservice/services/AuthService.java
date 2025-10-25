@@ -30,64 +30,53 @@ public class AuthService implements UserDetailsService {
     private final JwtUtil jwtUtil;
 
     public TokensDto authenticateUser( UserAuthDto dto) {
-        if(dto.isValid()){
-            User user = userRepository.findByEmail(dto.email()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-            if(passwordEncoder.matches(dto.password(), user.getPassword())){
-                return generator(user);
-            }
-        }
+       User user = userRepository.findByEmail(dto.email()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+       if(passwordEncoder.matches(dto.password(), user.getPassword())){
+           return generator(user);
+       }
         throw new IllegalArgumentException("Invalid username or password");
     }
 
     @SneakyThrows
     public TokensDto registrateUser(UserRegistrationDto dto) {
         if(dto == null) return null;
-        User user = null;
-        if(!dto.hasEmptyRequiredFields()){
-            if(userRepository.findByEmail(dto.email()).isPresent()){
-                throw new UserAlreadyExistException("User with email " + dto.email() + " already exists");
-            }
-            String role = StringUtils.isBlank(dto.role()) ? "USER" : Roles.valueOf(dto.role().toUpperCase()).toString();
-            user = User.builder()
-                    .firstName(dto.firstName())
-                    .lastName(dto.lastName())
-                    .roles(Set.of(role))
-                    .password(passwordEncoder.encode(dto.password()))
-                    .email(dto.email())
-                    .build();
-        }
+		if(userRepository.findByEmail(dto.email()).isPresent()){
+			throw new UserAlreadyExistException("User with email " + dto.email() + " already exists");
+		}
+		String role = StringUtils.isBlank(dto.role()) ? "USER" : Roles.valueOf(dto.role().toUpperCase()).toString();
+		User user = User.builder()
+				.firstName(dto.firstName())
+				.lastName(dto.lastName())
+				.roles(Set.of(role))
+				.password(passwordEncoder.encode(dto.password()))
+				.email(dto.email())
+				.build();
 
         return generator(user);
     }
 
     public TokensDto refreshToken(String refreshToken) {
-        if(StringUtils.isNotBlank(refreshToken)){
-            String username = jwtUtil.extractUsername(refreshToken);
-            User user = userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-            if(user.getRefreshToken().equals(refreshToken)) return generator(user);
-            else throw new JwtException("Wrong token, authenticate again");
-        }
-        return null;
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByEmail(username)
-                .orElseThrow(()-> new UsernameNotFoundException("Not found user with '%s'".formatted(username)));
+        String username = jwtUtil.extractUsername(refreshToken);
+        User user = userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        if(user.getRefreshToken().equals(refreshToken)) return generator(user);
+        else throw new JwtException("Wrong token, authenticate again");
     }
 
     @SneakyThrows
     private TokensDto generator(User user){
-        if(user != null){
-            String accessToken = jwtUtil.generateAccessToken(user);
-            String refreshToken = jwtUtil.generateRefreshToken(user);
-            user.setRefreshToken(refreshToken);
-
-            userRepository.save(user);
-            return TokensDto.builder()
-                    .accessToken(accessToken)
-                    .refreshToken(refreshToken)
-                    .build();
-        } else throw new IllegalArgumentException("Has Empty fields!");
+		String accessToken = jwtUtil.generateAccessToken(user);
+		String refreshToken = jwtUtil.generateRefreshToken(user);
+		user.setRefreshToken(refreshToken);
+		userRepository.save(user);
+		return TokensDto.builder()
+				.accessToken(accessToken)
+				.refreshToken(refreshToken)
+				.build();
     }
+
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		return userRepository.findByEmail(username)
+				.orElseThrow(()-> new UsernameNotFoundException("Not found user with '%s'".formatted(username)));
+	}
 }

@@ -6,7 +6,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./psqldb:/var/lib/postgresql/data
+      - ./psqldb:/var/lib/postgresql/18/docker
     environment:
       POSTGRES_DB: orders_db
       POSTGRES_USER: psql

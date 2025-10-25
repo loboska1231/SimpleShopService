@@ -2,7 +2,7 @@ spring:
   application:
     name: ShopService
   profiles:
-    active: prod
+    active: test
   datasource:
     url: jdbc:postgresql://localhost:5432/orders_db
     username: psql

@@ -1,7 +1,6 @@
 package org.project.shopservice.controller;
 
 import jakarta.annotation.security.RolesAllowed;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.project.shopservice.dtos.onRequest.orders.CreateOrderDto;
 import org.project.shopservice.dtos.onRequest.orders.UpdateOrderDto;

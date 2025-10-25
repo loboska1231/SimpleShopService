@@ -3,10 +3,7 @@ package org.project.shopservice.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.lang.reflect.Field;
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -28,7 +25,7 @@ public class OrderItemEntity {
 
     private Long amount;
     @ToString.Exclude
-    @ManyToOne(cascade = {})
+    @ManyToOne
     @JoinColumn(name = "order_id")
     private OrderEntity order;
 

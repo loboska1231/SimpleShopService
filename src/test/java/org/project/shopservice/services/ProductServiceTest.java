@@ -19,7 +19,6 @@ import org.project.shopservice.models.Product;
 import org.project.shopservice.repository.ProductRepository;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -30,11 +29,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ProductServiceTest {
 
 	@Mock
-	ProductRepository productRepository;
+	private ProductRepository productRepository;
 	@Spy
-	ProductMapper productMapper = new ProductMapperImpl();
+	private ProductMapper productMapper = new ProductMapperImpl();
 	@InjectMocks
-	ProductService productService;
+	private ProductService productService;
 
 	private Product product1;
 	private Product product2;

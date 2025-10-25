@@ -6,12 +6,13 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import org.hibernate.validator.constraints.Length;
 
-@Builder
+@Builder(toBuilder = true)
 public record CreateOrderItemDto(
 		@NotBlank(message = "Product Id is empty!")
 		@Length(min = 1) String productId,
 
-        @NotNull(message = "Amount is empty!") @Min(value = 1L, message = "amount should be greater than 1!")
+        @NotNull(message = "Amount is empty!")
+        @Min(value = 1L, message = "amount should be greater than 1!")
         Long amount
 ){
 }

@@ -1,7 +1,7 @@
 package org.project.shopservice.models;
 
-import io.micrometer.common.util.StringUtils;
 import lombok.*;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 public class User implements UserDetails {
 	@MongoId
 	private String id;
+	@Indexed(unique = true)
 	private String email;
 	private String password;
 	private String firstName;

@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.project.shopservice.dtos.onResponse.SendEmailDto;
 import org.project.shopservice.services.template.services.TemplateService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;

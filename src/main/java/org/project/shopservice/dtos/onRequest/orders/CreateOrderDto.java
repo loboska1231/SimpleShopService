@@ -6,14 +6,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
-import lombok.NonNull;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Length;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Builder
 public record CreateOrderDto(
@@ -22,19 +20,22 @@ public record CreateOrderDto(
         @Valid @NotEmpty(message = "Items are empty!")
         @Size(min = 1) List<CreateOrderItemDto> items
 ) {
-	public boolean hasEmptyFields() {
-		return StringUtils.isBlank(address) || CollectionUtils.isEmpty(items);
-	}
-	public CreateOrderDto tidyOrNull(){
-		var list = items.stream()
-				.filter(item->StringUtils.isNotBlank(item.productId()) && item.amount() >0 )
-				.toList();
-		if(CollectionUtils.isNotEmpty(list)){
-			return new CreateOrderDto(
-					this.address,
-					new ArrayList<>(items.stream().filter(ObjectUtils::isNotEmpty).toList())
-			);
-		}
-		else return null;
+	public CreateOrderDto tidy(){
+		Map<String, CreateOrderItemDto> hash = new HashMap<>();
+		List<CreateOrderItemDto> newItems = new ArrayList<>();
+		items.forEach(item->{
+			var dto = hash.get(item.productId());
+			if( dto==null){
+				hash.put(item.productId(), item);
+				dto = item;
+			} else {
+				Long amount = dto.amount();
+				amount+= item.amount();
+				dto.toBuilder().amount(amount).build();
+			}
+			newItems.add(dto);
+		});
+		return new CreateOrderDto(this.address, new ArrayList<>(newItems));
+
 	}
 }

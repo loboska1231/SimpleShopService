@@ -48,20 +48,16 @@ public class OrderService {
 *
  */
 	public OrderResponseDto createOrder(CreateOrderDto dto) {
-        if(!dto.hasEmptyFields()){
-	        CreateOrderDto tidiedDto = dto.tidyOrNull();
-			if(tidiedDto!=null){
-				OrderEntity order = orderMapper.toEntity(tidiedDto);
-				loadOrderItemsInfo(order);
-				order.setTotal();
-				order.assignOrder();
-				userService.fillFieldsEmailAndWhose(order);
-				OrderEntity save = orderRepository.save(order);
-				sendTemplate(order,"Order Created!");
-				return orderMapper.toDto(save);
-			}
-        }
-		return null;
+	    CreateOrderDto tidiedDto = dto.tidy();
+		if(CollectionUtils.isEmpty(tidiedDto.items())) throw new IllegalArgumentException("items is null");
+		OrderEntity order = orderMapper.toEntity(tidiedDto);
+		loadOrderItemsInfo(order);
+		order.setTotal();
+		order.assignOrder();
+		userService.fillFieldsEmailAndWhose(order);
+		OrderEntity save = orderRepository.save(order);
+		sendTemplate(order,"Order Created!");
+		return orderMapper.toDto(save);
 	}
 
     public Optional<OrderResponseDto> findOrderById(Long id) {
@@ -108,8 +104,8 @@ public class OrderService {
 								.collect(Collectors.toSet())
 						: Collections.emptySet();
 
-				boolean contains = !Collections.disjoint(idsToDelete, idsToUpdate);
-				if(!contains) {
+				boolean contains = Collections.disjoint(idsToDelete, idsToUpdate);
+				if(contains) {
 					List<OrderItemEntity> items = order.getItems();
 					idsToDelete.forEach(id -> items.removeIf(item -> item.getProductId().equals(id)));
 					order.setItems(items);

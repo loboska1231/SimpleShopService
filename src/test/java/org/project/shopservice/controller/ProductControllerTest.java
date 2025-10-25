@@ -35,7 +35,6 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -187,11 +186,6 @@ class ProductControllerTest {
 	@WithMockUser(roles = "ADMIN")
 	@SneakyThrows
 	void testCreateProduct_400ExpectingBadRequest(int price, String category, String type) {
-//		CreateProductDto dto = CreateProductDto.builder()
-//				.category(category)
-//				.type(type)
-//				.price(new BigDecimal(price))
-//				.build();
 		mockMvc.perform(
 				post("/products")
 						.contentType(MediaType.APPLICATION_JSON)
@@ -205,7 +199,6 @@ class ProductControllerTest {
 		).andExpect(status().isBadRequest());
 		verifyNoInteractions(productService);
 	}
-
 
 	@Test
 	@SneakyThrows

@@ -27,7 +27,10 @@ import org.project.shopservice.repository.ProductRepository;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -256,22 +259,23 @@ class OrderServiceTest {
 	}
 	@ParameterizedTest
 	@MethodSource("createOrder")
-	void testCreateOrder_expectingNull(CreateOrderDto nullDto){
-		assertDoesNotThrow(()->orderService.createOrder(nullDto));
-		assertNull(orderService.createOrder(nullDto));
+	void testCreateOrder_expectingIllegalArgumentException(CreateOrderDto nullDto){
+		assertThrows(IllegalArgumentException.class,()->orderService.createOrder(nullDto));
 		verifyNoInteractions(orderRepository);
 	}
 
 	@Test
 	void testCreateOrder_expectingIllegalArgs(){
+		List<CreateOrderItemDto> b = new ArrayList<>();
+		b.add(CreateOrderItemDto
+				.builder()
+				.productId("0x01")
+				.amount(5L)
+				.build());
 		var dto = CreateOrderDto
 				.builder()
 				.address("t")
-				.items(List.of(CreateOrderItemDto
-						.builder()
-								.productId("001")
-								.amount(5L)
-						.build()))
+				.items(b)
 				.build();
 		assertThrowsExactly(IllegalArgumentException.class,()->orderService.createOrder(dto));
 		verifyNoInteractions(orderRepository);

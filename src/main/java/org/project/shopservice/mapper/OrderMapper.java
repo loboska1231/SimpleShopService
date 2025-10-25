@@ -10,13 +10,10 @@ import org.project.shopservice.dtos.onResponse.OrderResponseDto;
 import org.project.shopservice.entities.OrderEntity;
 import org.project.shopservice.entities.OrderItemEntity;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;

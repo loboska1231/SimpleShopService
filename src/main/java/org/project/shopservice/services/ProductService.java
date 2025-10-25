@@ -33,9 +33,7 @@ public class ProductService {
 		if (min != null && max != null && category != null) {
 			products = productRepository.findAllByPriceGreaterThanEqualAndPriceLessThanEqualAndCategoryIsIgnoreCase(new Decimal128(min), new Decimal128(max), category);
 		} else if (min != null && max != null) {
-
 			if (max.compareTo(min) < 0) return Collections.emptyList();
-
 			products = productRepository.findAllByPriceGreaterThanEqualAndPriceLessThanEqual(new Decimal128(min), new Decimal128(max));
 		} else if (max != null && category != null) {
 			products = productRepository.findAllByPriceLessThanEqualAndCategoryIsIgnoreCase(new Decimal128(max), category);

@@ -15,8 +15,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import java.nio.charset.StandardCharsets;
+
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -45,7 +45,6 @@ class ExceptionAdviserIntegrationTest {
 				get("/products/{id}","1")
 		).andExpect(status().isNotFound())
 				.andExpect(jsonPath("$").hasJsonPath())
-				.andExpect(jsonPath("$.exceptionType").isNotEmpty())
 				.andExpect(jsonPath("$.exceptionType").value("NoSuchElementException"))
 				.andExpect(jsonPath("$.details..message").value("Product not found"))
 		;
@@ -62,7 +61,6 @@ class ExceptionAdviserIntegrationTest {
 										""")
 				).andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$").hasJsonPath())
-				.andExpect(jsonPath("$.exceptionType").isNotEmpty())
 				.andExpect(jsonPath("$.exceptionType").value("MethodArgumentNotValidException"))
 				.andExpect(jsonPath("$.details..category").value("Category is empty!"))
 				.andExpect(jsonPath("$.details..price").value("Price is null!"))
@@ -83,7 +81,6 @@ class ExceptionAdviserIntegrationTest {
 										""")
 				).andExpect(status().isNotFound())
 				.andExpect(jsonPath("$").hasJsonPath())
-				.andExpect(jsonPath("$.exceptionType").isNotEmpty())
 				.andExpect(jsonPath("$.exceptionType").value("NoSuchElementException"))
 				.andExpect(jsonPath("$.details..message").value("Product not found"))
 		;
@@ -101,7 +98,6 @@ class ExceptionAdviserIntegrationTest {
 								""")
 		).andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$").hasJsonPath())
-				.andExpect(jsonPath("$.exceptionType").isNotEmpty())
 				.andExpect(jsonPath("$.exceptionType").value("MethodArgumentNotValidException"))
 				.andExpect(jsonPath("$.details..address").value("Address is empty!"))
 				.andExpect(jsonPath("$.details..items").value("Items are empty!"));
@@ -120,7 +116,6 @@ class ExceptionAdviserIntegrationTest {
 										}""")
 				).andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$").hasJsonPath())
-				.andExpect(jsonPath("$.exceptionType").isNotEmpty())
 				.andExpect(jsonPath("$.exceptionType").value("MethodArgumentNotValidException"))
 				.andExpect(jsonPath("$.details..address").value("Address is empty!"))
 				.andExpect(jsonPath("$['details']['items[0].productId']").value("Product Id is empty!"))
@@ -133,7 +128,6 @@ class ExceptionAdviserIntegrationTest {
 						get("/orders/{id}",1)
 				).andExpect(status().isNotFound())
 				.andExpect(jsonPath("$").hasJsonPath())
-				.andExpect(jsonPath("$.exceptionType").isNotEmpty())
 				.andExpect(jsonPath("$.exceptionType").value("NoSuchElementException"))
 				.andExpect(jsonPath("$.details..message").value("Order not found"));
 	}
@@ -150,7 +144,6 @@ class ExceptionAdviserIntegrationTest {
 										""")
 				).andExpect(status().isNotFound())
 				.andExpect(jsonPath("$").hasJsonPath())
-				.andExpect(jsonPath("$.exceptionType").isNotEmpty())
 				.andExpect(jsonPath("$.exceptionType").value("NoSuchElementException"))
 				.andExpect(jsonPath("$.details..message").value("Order not found"));
 	}
@@ -165,7 +158,6 @@ class ExceptionAdviserIntegrationTest {
 										"""))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$").hasJsonPath())
-				.andExpect(jsonPath("$.exceptionType").isNotEmpty())
 				.andExpect(jsonPath("$.exceptionType").value("MethodArgumentNotValidException"))
 				.andExpect(jsonPath("$.details..firstName").value("First name is empty!"))
 				.andExpect(jsonPath("$.details..lastName").value("Last name is empty!"))
@@ -187,7 +179,6 @@ class ExceptionAdviserIntegrationTest {
 										"""))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$").hasJsonPath())
-				.andExpect(jsonPath("$.exceptionType").isNotEmpty())
 				.andExpect(jsonPath("$.exceptionType").value("MethodArgumentNotValidException"))
 				.andExpect(jsonPath("$.details..refreshToken").value("Refresh token is empty!"))
 		;
@@ -199,6 +190,7 @@ class ExceptionAdviserIntegrationTest {
 		mockMvc.perform(
 						post("/auth/{endpoint}", "signin")
 								.contentType(MediaType.APPLICATION_JSON)
+								.characterEncoding(StandardCharsets.UTF_8)
 								.content("""
 										{
 											"email": "",
@@ -207,7 +199,6 @@ class ExceptionAdviserIntegrationTest {
 										"""))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$").hasJsonPath())
-				.andExpect(jsonPath("$.exceptionType").isNotEmpty())
 				.andExpect(jsonPath("$.exceptionType").value("MethodArgumentNotValidException"))
 				.andExpect(jsonPath("$.details..email").value("Email is empty!"))
 				.andExpect(jsonPath("$.details..password").exists())

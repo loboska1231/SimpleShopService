@@ -22,7 +22,6 @@ public interface ProductMapper {
 	    if ( dto == null ) {
 		    return model;
 	    }
-
 	    if ( dto.category() != null && StringUtils.isNotBlank(dto.category())) {
 		    model.setCategory( dto.category() );
 	    }

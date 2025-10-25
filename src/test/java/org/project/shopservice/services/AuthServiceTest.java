@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.project.shopservice.dtos.onRequest.users.UserAuthDto;
 import org.project.shopservice.dtos.onRequest.users.UserRegistrationDto;
+import org.project.shopservice.dtos.onResponse.TokensDto;
 import org.project.shopservice.models.User;
 import org.project.shopservice.repository.UserRepository;
 import org.project.shopservice.security.utils.JwtUtil;
@@ -57,50 +58,6 @@ class AuthServiceTest {
 				.build();
 	}
 
-	static Stream<Arguments> registrateUserThrows(){
-		return Stream.of(
-				Arguments.of(UserRegistrationDto
-						.builder()
-						.email(" ")
-						.password(" ")
-						.firstName("test")
-						.lastName("testing")
-								.role("USER")
-						.build()),
-				Arguments.of(UserRegistrationDto
-						.builder()
-						.email(" ")
-						.password(" ")
-						.firstName(" ")
-						.lastName(" ")
-								.role("ADmin")
-						.build()),
-				Arguments.of(UserRegistrationDto
-						.builder()
-						.email(" ")
-						.password(" ")
-						.firstName(" ")
-						.lastName(" ")
-						.build()),
-				Arguments.of(UserRegistrationDto
-						.builder()
-						.email(" ")
-						.password(" ")
-						.firstName(" ")
-						.lastName(" ")
-								.role(" ")
-						.build())
-		);
-	}
-
-	@ParameterizedTest
-	@MethodSource("registrateUserThrows")
-	public void testRegistateUser_throwsIllegalArg(UserRegistrationDto dto){
-		assertTrue(dto.hasEmptyRequiredFields());
-		assertThrowsExactly(IllegalArgumentException.class,()-> authService.registrateUser(dto));
-		verifyNoInteractions(userRepository);
-	}
-
 	static Stream<Arguments> registrateUserDoesNotThrows(){
 		return Stream.of(
 				Arguments.of(
@@ -136,7 +93,6 @@ class AuthServiceTest {
 	public void testRegistateUser(UserRegistrationDto dto){
 
 		assertDoesNotThrow(()-> authService.registrateUser(dto));
-		assertFalse(dto.hasEmptyRequiredFields());
 		verify(userRepository).save(any(User.class));
 		verify(userRepository).findByEmail(anyString());
 	}
@@ -150,7 +106,7 @@ class AuthServiceTest {
 		verify(userRepository).save(any(User.class));
 	}
 
-	static Stream<Arguments> authenticateUserThrowsIllegalArgumentException(){
+	static Stream<Arguments> authenticateUserThrowsUsernameNotFoundException(){
 		return Stream.of(
 				Arguments.of(new UserAuthDto(" "," ")),
 				Arguments.of(new UserAuthDto("","")),
@@ -159,10 +115,10 @@ class AuthServiceTest {
 	}
 
 	@ParameterizedTest
-	@MethodSource("authenticateUserThrowsIllegalArgumentException")
+	@MethodSource("authenticateUserThrowsUsernameNotFoundException")
 	public void testAuthenticateUser_throwsIllegalArgumentException(UserAuthDto dto){
-		assertThrowsExactly(IllegalArgumentException.class, ()-> authService.authenticateUser(dto));
-		verifyNoInteractions(userRepository);
+		assertThrowsExactly(UsernameNotFoundException.class, ()-> authService.authenticateUser(dto));
+		verify(userRepository).findByEmail(eq(dto.email()));
 	}
 	static Stream<Arguments> authenticateUserThrowsUsernameNotFound(){
 		return Stream.of(
@@ -183,11 +139,11 @@ class AuthServiceTest {
 
 	@Test
 	public void testRefreshToken(){
-		when(jwtUtil.extractUsername(anyString())).thenReturn("test@testing.com");
 		when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user));
+
 		when(jwtUtil.extractUsername(anyString())).thenReturn("test@testing.com");
-		assertDoesNotThrow(()-> authService.refreshToken(anyString()));
-		assertNotNull(authService.refreshToken("refresh"));
+
+		assertDoesNotThrow(()-> authService.refreshToken("refresh"));
 		verify(userRepository).findByEmail(anyString());
 		verify(userRepository).save(any(User.class));
 	}

@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.project.shopservice.entities.OrderEntity;
 import org.project.shopservice.models.User;
 import org.project.shopservice.repository.UserRepository;
-import org.project.shopservice.security.utils.JwtUtil;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -36,10 +35,8 @@ public class UserService {
 	}
 
 	public OrderEntity fillFieldsEmailAndWhose(OrderEntity order){
-		String email = extractUsername();
-		String whose = extractFullName();
-		order.setEmail(email);
-		order.setWhose(whose);
+		order.setEmail(extractUsername());
+		order.setWhose(extractFullName());
 		return order;
 	}
 
