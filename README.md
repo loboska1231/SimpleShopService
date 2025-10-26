@@ -115,7 +115,7 @@ header `AUTHORIZATION` and set value that must start with `Bearer ...` .
 ## 3. Future plans 
     
 * Add Swagger-UI annotation to Controllers to describe them 
-* * Add SecurityScheme for Swagger-UI
+    * Add SecurityScheme for Swagger-UI
 * Add `.env.postgres` and `.env.mongo` file which can replace field values in [compose.yaml](/compose.yaml)
 
 Over time, items will be added or removed.
