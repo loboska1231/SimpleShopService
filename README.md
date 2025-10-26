@@ -51,13 +51,14 @@ Also, user can create order with this/these product(s) if he *sign in* or *sign 
 4. Open `Terminal` write `docker compose up psql-service mongo-service`
 
 5. `Run application` or press `Shift+F10`
-    > [!WARNING]
-    > You may have an error with timezone :
-    > `FATAL: invalid value for parameter "TimeZone": "Europe/Kiev"`
-    > All you need to do is change your timezone on PC to `UTC`
-    > And then `Run application` again
 
-6. If you did everything correctly, you should be able to access swagger by this URL: http://localhost:8080/swagger-ui/index.html .
+> [!WARNING]
+> You may have an error with timezone :
+> `FATAL: invalid value for parameter "TimeZone": "Europe/Kiev"`
+> All you need to do is change your timezone on PC to `UTC`
+> and then `Run application` or press `Shift+F10` again
+
+7. If you did everything correctly, you should be able to access swagger by this URL: http://localhost:8080/swagger-ui/index.html .
 
 ## 2.3 Swagger-UI
 this URL: http://localhost:8080/swagger-ui/index.html 
