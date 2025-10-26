@@ -4,7 +4,7 @@ spring:
   datasource:
     url: ${POSTGRES_URL}
     username: ${SQL_USERNAME}
-    password: ${SQL_USERNAME}
+    password: ${SQL_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: none
@@ -16,7 +16,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: ${MAIL_USERNAME}
-    password: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
