@@ -23,7 +23,7 @@ import org.springframework.security.web.access.intercept.AuthorizationFilter;
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
-@EnableMethodSecurity(jsr250Enabled = true)
+@EnableMethodSecurity
 public class SecurityConfig {
 	private final JwtUtil jwtUtil;
 	private final AuthService authService;
