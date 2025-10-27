@@ -175,6 +175,8 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                    <outputDirectory>backend</outputDirectory>
+                    <finalName>Shop</finalName>
                 </configuration>
             </plugin>
         </plugins>

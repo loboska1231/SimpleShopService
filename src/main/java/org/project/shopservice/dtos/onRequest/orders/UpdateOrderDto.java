@@ -1,5 +1,6 @@
 package org.project.shopservice.dtos.onRequest.orders;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import org.springframework.util.CollectionUtils;
 
@@ -11,6 +12,7 @@ public record UpdateOrderDto(
         List<String> onDelete,
         List<UpdateOrderItemDto> updateItems
 ){
+	@Schema(hidden = true)
 	public boolean isEmpty(){
 		return CollectionUtils.isEmpty(onDelete) &&  CollectionUtils.isEmpty(updateItems) && address==null;
 	}

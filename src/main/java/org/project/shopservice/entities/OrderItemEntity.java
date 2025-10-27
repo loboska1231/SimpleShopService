@@ -18,7 +18,7 @@ public class OrderItemEntity {
 
     @Column(name = "product_id")
     private String productId;
-
+	@Column(name = "category_and_type")
     private String categoryAndType;
 
     private BigDecimal price;

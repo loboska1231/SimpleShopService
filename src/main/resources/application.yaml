@@ -2,9 +2,9 @@ spring:
   application:
     name: ShopService
   datasource:
-    url: ${POSTGRES_URL}
-    username: ${SQL_USERNAME}
-    password: ${SQL_PASSWORD}
+    url: ${POSTGRES_URL}/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: none

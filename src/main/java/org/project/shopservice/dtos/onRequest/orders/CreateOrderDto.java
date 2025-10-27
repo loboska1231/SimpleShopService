@@ -20,6 +20,7 @@ public record CreateOrderDto(
         @Valid @NotEmpty(message = "Items are empty!")
         @Size(min = 1) List<CreateOrderItemDto> items
 ) {
+
 	public CreateOrderDto tidy(){
 		Map<String, CreateOrderItemDto> hash = new HashMap<>();
 		List<CreateOrderItemDto> newItems = new ArrayList<>();

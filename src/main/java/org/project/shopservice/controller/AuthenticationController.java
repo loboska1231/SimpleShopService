@@ -80,7 +80,7 @@ public class AuthenticationController {
 			description = "Refresh tokens to update user's field refreshToken, receive new tokens and send specific requests to other URI's",
 			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
 					required = true,
-					content = @Content(schema = @Schema(implementation = UserRegistrationDto.class))))
+					content = @Content(schema = @Schema(implementation = RefreshToken.class))))
 	@ApiResponses(value = {
 			@ApiResponse(
 					responseCode = "200",
