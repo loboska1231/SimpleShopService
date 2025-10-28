@@ -60,6 +60,36 @@ Also, user can create order with this/these product(s) if he *sign in* or *sign 
 
 7. If you did everything correctly, you should be able to access swagger by this URL: http://localhost:8080/swagger-ui/index.html .
 
+<<<<<<< HEAD
+=======
+#### 2.2.2 Run in Docker Container
+
+1. Same as point [1. from 2.2.1](#221-run-in-intellij-idea)
+
+2. `Environment variables` 
+
+    Required to set all values in files [`.java.env`](/env/.java.env) :
+    
+    ![env_java](/docs-photos/env_java_for_docker.png)
+
+    and [`.postgres.env`](/env/.postgres.env) :
+
+    ![env_postgres](/docs-photos/env_postgres_for_docker.png)
+
+3. Open `Terminal` write these command in this order
+    ```shell
+    mvn clean package -DskipTests
+    
+    docker compose build
+    
+    docker compose pull
+    
+    docker compose up
+    ```
+    It still has the problem with timezone.
+
+4. Same as point [6. from 2.2.1](#221-run-in-intellij-idea)
+>>>>>>> 00df49b (forgot to add images + link for point 1. from 2.2.2)
 ## 2.3 Swagger-UI
 this URL: http://localhost:8080/swagger-ui/index.html 
     has three main endpoints 
