@@ -7,9 +7,12 @@ import lombok.RequiredArgsConstructor;
 import org.project.shopservice.entities.OrderEntity;
 import org.project.shopservice.models.User;
 import org.project.shopservice.repository.UserRepository;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.Collection;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +45,7 @@ public class UserService {
 
 	public boolean canAccess(String email){
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
-		return username.equals(email);
+		Collection<SimpleGrantedAuthority> authorities = (Collection<SimpleGrantedAuthority>)    SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+		return username.equals(email) || authorities.contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
 	}
 }

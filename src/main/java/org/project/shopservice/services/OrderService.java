@@ -39,14 +39,7 @@ public class OrderService {
     public List<OrderResponseDto> findOrders() {
         return orderRepository.findAll().stream().map(orderMapper::toDto).toList();
     }
-/*
-* if(userService.isOwner(order.getEmail())){
-*   ...
-* } throw new NotAllowedException("You are not allowed to access to this ... ")
-*
-*
-*
- */
+
 	public OrderResponseDto createOrder(CreateOrderDto dto) {
 	    CreateOrderDto tidiedDto = dto.tidy();
 		if(CollectionUtils.isEmpty(tidiedDto.items())) throw new IllegalArgumentException("items is null");
@@ -66,7 +59,7 @@ public class OrderService {
 
     public void deleteOrderById(Long id) {
         Optional<OrderEntity> order = orderRepository.findById(id);
-        if(order.isPresent()) {
+        if(order.isPresent() && userService.canAccess(order.get().getEmail())) {
             order.get().setStatus("DELETED");
             sendTemplate(order.get(),"Order Deleted!");
             orderRepository.delete(order.get());

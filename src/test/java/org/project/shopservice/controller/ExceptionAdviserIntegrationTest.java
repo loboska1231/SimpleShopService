@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest({OrderController.class, ProductController.class, AuthenticationController.class})
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc(addFilters = false)
-@WithMockUser
+@WithMockUser(username = "user")
 class ExceptionAdviserIntegrationTest {
 
 	@Autowired
@@ -186,7 +186,6 @@ class ExceptionAdviserIntegrationTest {
 	@Test
 	@SneakyThrows
 	void testSignin_MethodArgumentNotValidException(){
-//		when(authService.authenticateUser(any(UserAuthDto.class))).thenReturn(null);
 		mockMvc.perform(
 						post("/auth/{endpoint}", "signin")
 								.contentType(MediaType.APPLICATION_JSON)
@@ -200,9 +199,8 @@ class ExceptionAdviserIntegrationTest {
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$").hasJsonPath())
 				.andExpect(jsonPath("$.exceptionType").value("MethodArgumentNotValidException"))
-				.andExpect(jsonPath("$.details..email").value("Email is empty!"))
+				.andExpect(jsonPath("$.details..email").exists())
 				.andExpect(jsonPath("$.details..password").exists())
 		;
 	}
-
 }

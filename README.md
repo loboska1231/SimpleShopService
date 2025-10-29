@@ -16,6 +16,7 @@ Also, user can create order with this/these product(s) if he *sign in* or *sign 
 
 ### 2.2 How to run
 
+#### 2.2.1 Run application in Intellij IDEA
 1. You should open in Intellij IDEA File -> `New Project` -> `Project from version control`
     -> `Repository URL` -> `URL` (https://github.com/loboska1231/SimpleShopService.git) -> `Clone`
 
@@ -25,9 +26,9 @@ Also, user can create order with this/these product(s) if he *sign in* or *sign 
    ```yaml
     spring:
        datasource:
-         url: ${POSTGRES_URL}
-         username: ${SQL_USERNAME}
-         password: ${POSTGRES_URL}
+         url: ${POSTGRES_URL}/${POSTGRES_DB}
+         username: ${POSTGRES_USER}
+         password: ${POSTGRES_PASSWORD}
        data:
          mongodb:
            uri: ${MONGODB_URI}
@@ -54,17 +55,18 @@ Also, user can create order with this/these product(s) if he *sign in* or *sign 
 
 > [!WARNING]
 > You may have an error with timezone :
+> 
 > `FATAL: invalid value for parameter "TimeZone": "Europe/Kiev"`
+> 
 > All you need to do is change your timezone on PC to `UTC`
+> 
 > and then `Run application` or press `Shift+F10` again
 
-7. If you did everything correctly, you should be able to access swagger by this URL: http://localhost:8080/swagger-ui/index.html .
+6. If you did everything correctly, you should be able to access swagger by this URL: http://localhost:8080/swagger-ui/index.html .
 
-<<<<<<< HEAD
-=======
 #### 2.2.2 Run in Docker Container
 
-1. Same as point [1. from 2.2.1](#221-run-in-intellij-idea)
+1. Same as point [1. from 2.2.1](#221-run-application-in-intellij-idea)
 
 2. `Environment variables` 
 
@@ -88,8 +90,8 @@ Also, user can create order with this/these product(s) if he *sign in* or *sign 
     ```
     It still has the problem with timezone.
 
-4. Same as point [6. from 2.2.1](#221-run-in-intellij-idea)
->>>>>>> 00df49b (forgot to add images + link for point 1. from 2.2.2)
+4. Same as point [6. from 2.2.1](#221-run-application-in-intellij-idea)
+
 ## 2.3 Swagger-UI
 this URL: http://localhost:8080/swagger-ui/index.html 
     has three main endpoints 
@@ -141,11 +143,3 @@ If you didn't specify field **role**, by default it would be role `USER`.
 After all of these operations you might have `JWT` token with role `ADMIN`
 and you want to send a specific request to do something, you should put this token into
 header `AUTHORIZATION` and set value that must start with `Bearer ...` .
-
-## 3. Future plans 
-    
-* Add `.env.postgres` and `.env.mongo` file which can replace field values in [compose.yaml](/compose.yaml)
-* Check tests
-* Add `.env.java` file which can replace field values in [compose.yaml](/compose.yaml) for java docker service
-
-Over time, items will be added or removed.

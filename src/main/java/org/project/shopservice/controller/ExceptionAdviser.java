@@ -5,6 +5,7 @@ import org.project.shopservice.dtos.onResponse.ErrorDto;
 import org.project.shopservice.exceptions.UserAlreadyExistException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -19,15 +20,16 @@ import java.util.NoSuchElementException;
 @RestControllerAdvice
 public class ExceptionAdviser {
 
-	//*
-	// NullPointerException
-	// IllegalArgumentException
-	// NoSuchElementException
-	// UsernameNotFoundException
-	// JwtException
-	// UserAlreadyExistException
-	// MethodArgumentNotValidException
-	// *
+	/*
+	 NullPointerException
+	 IllegalArgumentException
+	 NoSuchElementException
+	 UsernameNotFoundException
+	 JwtException
+	 UserAlreadyExistException
+	 MethodArgumentNotValidException
+	 AccessDeniedException
+	 */
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ErrorDto> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
@@ -44,6 +46,19 @@ public class ExceptionAdviser {
 				.details(errors)
 				.build();
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.body(dto);
+	}
+	@ExceptionHandler(AccessDeniedException.class)
+	public ResponseEntity<ErrorDto> handleAccessDeniedException(AccessDeniedException e) {
+		HashMap<String, String> errors = new HashMap<>();
+
+		errors.put("message", e.getMessage());
+		ErrorDto dto = ErrorDto.builder()
+				.date(Instant.now())
+				.exceptionType("AccessDeniedException")
+				.details(errors)
+				.build();
+		return ResponseEntity.status(HttpStatus.FORBIDDEN)
 				.body(dto);
 	}
 

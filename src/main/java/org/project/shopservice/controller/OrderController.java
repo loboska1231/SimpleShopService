@@ -17,6 +17,7 @@ import org.project.shopservice.dtos.onResponse.ErrorDto;
 import org.project.shopservice.dtos.onResponse.OrderResponseDto;
 import org.project.shopservice.services.OrderService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -105,6 +106,7 @@ public class OrderController {
 			)
 	})
 	@GetMapping("/{id}")
+	@PostAuthorize("hasRole('ADMIN') or returnObject.body.email() == authentication.name")
 	public ResponseEntity<OrderResponseDto> getOrder(@PathVariable Long id) {
 		return ResponseEntity.ok(orderService.findOrderById(id).orElseThrow(() -> new NoSuchElementException("Order not found")));
 	}
@@ -133,6 +135,7 @@ public class OrderController {
 			)
 	})
 	@PatchMapping("/{id}")
+	@PostAuthorize("hasRole('ADMIN') or returnObject.body.email() == authentication.name")
 	public ResponseEntity<OrderResponseDto> updateOrder(@PathVariable Long id, @Validated @RequestBody UpdateOrderDto dto) {
 		return ResponseEntity.ok(orderService.updateOrder(id, dto).orElseThrow((() -> new NoSuchElementException("Order not found"))));
 	}
@@ -160,4 +163,7 @@ public class OrderController {
 		orderService.deleteOrderById(id);
 		return ResponseEntity.noContent().build();
 	}
+
+
+
 }

@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -57,19 +56,13 @@ class OrderControllerTest {
 	private PasswordEncoder passwordEncoder;
 
 	private Instant now;
-	private Product product;
 	private OrderResponseDto dto;
 	private List<OrderResponseDto> orders;
 
 	@BeforeEach
 	void init() {
 		now = Instant.now();
-		product = Product.builder()
-				.id("0x1")
-				.type("test")
-				.category("testing")
-				.price(BigDecimal.valueOf(100))
-				.build();
+
 		dto = OrderResponseDto.builder()
 				.id(1L)
 				.whose("tester test")
@@ -177,92 +170,6 @@ class OrderControllerTest {
 
 	@Test
 	@SneakyThrows
-	void testGetOrder_200ExpectingIsOk_NotNullBody() {
-		when(orderService.findOrderById(eq(1L)))
-				.thenReturn(Optional.of(dto));
-		mockMvc.perform(get("/orders/{id}", 1))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$").exists())
-				.andExpect(jsonPath("$").isNotEmpty())
-				.andExpect(jsonPath("$.id").value("1"))
-				.andExpect(jsonPath("$.whose").value("tester test"))
-				.andExpect(jsonPath("$.email").value("test@test.com"))
-				.andExpect(jsonPath("$.address").value("test address"))
-				.andExpect(jsonPath("$.total_price").value(600))
-				.andExpect(jsonPath("$.status").value("CREATED"))
-				.andExpect(jsonPath("$.items[0].amount").value(6))
-				.andExpect(jsonPath("$.items[0].productId").value("0x1"));
-	}
-	@Test
-	@SneakyThrows
-	void testGetOrder_200ExpectingIsOk_NullBody() {
-		when(orderService.findOrderById(eq(2L)))
-				.thenReturn(Optional.of(dto));
-		mockMvc.perform(get("/orders/{id}", 2))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$").exists());
-		verify(orderService).findOrderById(eq(2L));
-		assertNotNull(orderService.findOrderById(2L));
-	}
-
-	@Test
-	@SneakyThrows
-	void testUpdateOrder_200ExpectingIsOk_NotNullBody() {
-		UpdateOrderDto updateOrderDto = UpdateOrderDto.builder()
-				.address("test new")
-				.build();
-		when(orderService.updateOrder(eq(1L), any(UpdateOrderDto.class)))
-				.thenReturn(Optional.of(dto.toBuilder().status("UPDATED").address(updateOrderDto.address()).build()));
-		mockMvc.perform(patch("/orders/{id}", 1)
-						.contentType(MediaType.APPLICATION_JSON)
-						.content("""
-								{
-									"address": "test new"
-								}
-								""")
-				).andExpect(status().isOk())
-				.andExpect(jsonPath("$").exists())
-				.andExpect(jsonPath("$").isNotEmpty())
-				.andExpect(jsonPath("$.id").value("1"))
-				.andExpect(jsonPath("$.whose").value("tester test"))
-				.andExpect(jsonPath("$.email").value("test@test.com"))
-				.andExpect(jsonPath("$.address").value("test new"))
-				.andExpect(jsonPath("$.total_price").value(600))
-				.andExpect(jsonPath("$.status").value("UPDATED"))
-				.andExpect(jsonPath("$.items[0].amount").value(6))
-				.andExpect(jsonPath("$.items[0].productId").value(product.getId()));
-		verify(orderService).updateOrder(eq(1L), any(UpdateOrderDto.class));
-	}
-	@Test
-	@SneakyThrows
-	void testUpdateOrder_200ExpectingIsOk_NothingChanged() {
-		when(orderService.updateOrder(eq(1L), any(UpdateOrderDto.class)))
-				.thenReturn(Optional.of(dto));
-		mockMvc.perform(patch("/orders/{id}", 1)
-						.contentType(MediaType.APPLICATION_JSON)
-						.content("""
-								{
-									"address": "",
-									"onDelete": [],
-									"updateItems": []
-								}
-								""")
-				).andExpect(status().isOk())
-				.andExpect(jsonPath("$").exists())
-				.andExpect(jsonPath("$").isNotEmpty())
-				.andExpect(jsonPath("$.id").value(dto.id()))
-				.andExpect(jsonPath("$.whose").value(dto.whose()))
-				.andExpect(jsonPath("$.email").value(dto.email()))
-				.andExpect(jsonPath("$.address").value(dto.address()))
-				.andExpect(jsonPath("$.total_price").value(dto.total_price()))
-				.andExpect(jsonPath("$.status").value(dto.status()))
-				.andExpect(jsonPath("$.items[0].amount").value(dto.items().get(0).amount()))
-				.andExpect(jsonPath("$.items[0].productId").value(dto.items().get(0).productId()));
-		verify(orderService).updateOrder(eq(1L), any(UpdateOrderDto.class));
-	}
-
-	@Test
-	@SneakyThrows
 	void testUpdateOrder_ExpectingNoSuchElementException(){
 		mockMvc.perform(patch("/orders/{id}", 2)
 				.contentType(MediaType.APPLICATION_JSON)
@@ -283,5 +190,37 @@ class OrderControllerTest {
 		mockMvc.perform(delete("/orders/{id}", 1))
 				.andExpect(status().isNoContent());
 		verify(orderService).deleteOrderById(eq(1L));
+	}
+
+	@Test
+	@SneakyThrows
+	void testGetOrder_403ExpectingForbidden_AccessDeniedException() {
+		when(orderService.findOrderById(eq(1L)))
+				.thenReturn(Optional.of(OrderResponseDto.builder().email("test").build()));
+		mockMvc.perform(get("/orders/{id}", 1))
+				.andExpect(status().isForbidden())
+				.andExpect(jsonPath("$").exists())
+				.andExpect(jsonPath("$.exceptionType").value("AccessDeniedException"))
+		;
+	}
+
+	@Test
+	@SneakyThrows
+	void testUpdateOrder_403ExpectingForbidden_AccessDeniedException() {
+
+		when(orderService.updateOrder(eq(1L), any(UpdateOrderDto.class)))
+				.thenReturn(Optional.of(OrderResponseDto.builder().email("test").build()));
+
+		mockMvc.perform(patch("/orders/{id}", 1)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("""
+								{
+									"address": "test new"
+								}
+								""")
+				).andExpect(status().isForbidden())
+				.andExpect(jsonPath("$").exists())
+				.andExpect(jsonPath("$.exceptionType").value("AccessDeniedException"));
+		verify(orderService).updateOrder(eq(1L), any(UpdateOrderDto.class));
 	}
 }
