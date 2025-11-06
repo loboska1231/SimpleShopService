@@ -16,6 +16,7 @@ import org.project.shopservice.models.Product;
 import org.project.shopservice.repository.OrderRepository;
 import org.project.shopservice.repository.ProductRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
@@ -54,7 +55,10 @@ public class OrderService {
 	}
 
     public Optional<OrderResponseDto> findOrderById(Long id) {
-        return orderRepository.findById(id).map(orderMapper::toDto);
+
+	    Optional<OrderEntity> order = orderRepository.findById(id);
+	    if(!(order.isPresent() && userService.canAccess(order.get().getEmail()))) return  Optional.empty();
+	    return order.map(orderMapper::toDto);
     }
 
     public void deleteOrderById(Long id) {
@@ -65,10 +69,10 @@ public class OrderService {
             orderRepository.delete(order.get());
         }
     }
-
+	@Transactional
     public Optional<OrderResponseDto> updateOrder(Long order_id, UpdateOrderDto dto) {
         Optional<OrderEntity> order = orderRepository.findById(order_id);
-	    if(order.isPresent() && !dto.isEmpty()){
+	    if(order.isPresent()&& userService.canAccess(order.get().getEmail()) && !dto.isEmpty() ){
 		    OrderEntity  entity = order.get();
 		    deleteItems(entity, dto);
 		    orderMapper.updateOrder(entity, dto);
