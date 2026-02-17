@@ -132,7 +132,7 @@ where _**email**_ and _**password**_ are `REQUIRED`!
 
 Or you can send `POST` request to `localhost:8080/auth/refresh` with refreshToken
 which you received from two previous requests and after that you will update refresh token in user field **refreshToken**
-and receive tokens.
+and receive new tokens.
 ```json
 {
   "refreshToken": "some refresh token"
@@ -140,6 +140,8 @@ and receive tokens.
 ```
 If you didn't specify field **role**, by default it would be role `USER`.
 
-After all of these operations you might have `JWT` token with role `ADMIN`
-and you want to send a specific request to do something, you should put this token into
+After all of these operations you will have `JWT` token with role `ADMIN`
+and you want to send a specific request (delete/patch), you need to put this token into
 header `AUTHORIZATION` and set value that must start with `Bearer ...` .
+
+The string in header `AUTHORIZATION` has to look like this `Bearer eyJhbGciOiJIUzI1N...` .
